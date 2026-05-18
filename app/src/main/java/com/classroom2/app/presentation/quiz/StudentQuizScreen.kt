@@ -1,14 +1,19 @@
 package com.classroom2.app.presentation.quiz
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -19,16 +24,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.classroom2.app.presentation.components.BadgePill
 import com.classroom2.app.presentation.components.ClassroomTopBar
-import com.classroom2.app.presentation.components.EmptyState
+import com.classroom2.app.presentation.components.EmptyStateCard
 import com.classroom2.app.presentation.components.OptionCard
 import com.classroom2.app.presentation.components.PrimaryActionButton
+import com.classroom2.app.presentation.components.StatusChip
 import com.classroom2.app.presentation.components.SuccessCheck
 import com.classroom2.app.ui.theme.ClassroomGreen
+import com.classroom2.app.ui.theme.ClassroomGreenSoft
+import com.classroom2.app.ui.theme.ClassroomOrange
+import com.classroom2.app.ui.theme.ClassroomOrangeSoft
+import com.classroom2.app.ui.theme.ClassroomShapes
+import com.classroom2.app.ui.theme.ClassroomSpacing
 
 @Composable
 fun StudentQuizScreen(
@@ -46,49 +59,66 @@ fun StudentQuizScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = ClassroomSpacing.lg, vertical = ClassroomSpacing.sm),
+            verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.md)
         ) {
             val q = quiz
-            if (q == null) {
-                EmptyState(
+            when {
+                q == null -> EmptyStateCard(
                     title = "No live quiz",
                     message = "Hang tight — your professor will start one any moment.",
                     emoji = "⏳"
                 )
-            } else if (submission?.isSuccess == true) {
-                AnswerConfirmation(correct = submission?.correct == true, totalPoints = submission?.totalPoints ?: 0)
-            } else {
-                Text(
-                    q.question,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold
-                )
-                q.options.forEachIndexed { index, opt ->
-                    OptionCard(
-                        letter = ('A' + index).toString(),
-                        text = opt,
-                        selected = selected == index,
-                        onClick = { selected = index }
+
+                submission?.isSuccess == true ->
+                    AnswerConfirmation(
+                        correct = submission?.correct == true,
+                        totalPoints = submission?.totalPoints ?: 0
+                    )
+
+                else -> {
+                    StatusChip(
+                        label = "Live · one answer only",
+                        accent = ClassroomOrange,
+                        softBackground = ClassroomOrangeSoft
+                    )
+                    Text(
+                        q.question,
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)) {
+                        q.options.forEachIndexed { index, opt ->
+                            OptionCard(
+                                letter = ('A' + index).toString(),
+                                text = opt,
+                                selected = selected == index,
+                                onClick = { selected = index }
+                            )
+                        }
+                    }
+                    submission?.error?.let { msg ->
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = ClassroomShapes.Card,
+                            color = MaterialTheme.colorScheme.errorContainer
+                        ) {
+                            Text(
+                                msg,
+                                modifier = Modifier.padding(ClassroomSpacing.md),
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    }
+                    PrimaryActionButton(
+                        text = "Submit answer",
+                        onClick = { selected?.let(vm::submitAnswer) },
+                        enabled = selected != null
                     )
                 }
-                submission?.error?.let { msg ->
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
-                        color = MaterialTheme.colorScheme.errorContainer
-                    ) {
-                        Text(msg, modifier = Modifier.padding(16.dp), color = MaterialTheme.colorScheme.onErrorContainer)
-                    }
-                }
-                PrimaryActionButton(
-                    text = "Submit answer",
-                    onClick = { selected?.let(vm::submitAnswer) },
-                    enabled = selected != null
-                )
             }
 
-            Spacer(Modifier.size(16.dp))
+            Spacer(Modifier.size(ClassroomSpacing.md))
         }
     }
 }
@@ -97,27 +127,44 @@ fun StudentQuizScreen(
 private fun AnswerConfirmation(correct: Boolean, totalPoints: Int) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.md)
     ) {
-        Spacer(Modifier.size(24.dp))
-        SuccessCheck()
-        Text(
-            if (correct) "Correct! 🎯" else "Answer submitted",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            if (correct) "+20 points (5 participation • 15 correct)"
-            else "+5 participation points",
-            style = MaterialTheme.typography.bodyLarge,
-            color = ClassroomGreen,
-            fontWeight = FontWeight.SemiBold
-        )
-        Text(
-            "Total: $totalPoints pts",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Spacer(Modifier.size(ClassroomSpacing.lg))
+        AnimatedVisibility(
+            visible = true,
+            enter = fadeIn(tween(300)) + scaleIn(tween(300), initialScale = 0.7f)
+        ) {
+            SuccessCheck()
+        }
+        AnimatedVisibility(
+            visible = true,
+            enter = fadeIn(tween(350, delayMillis = 120)) + slideInVertically(tween(350, delayMillis = 120)) { it / 6 }
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    if (correct) "Correct! 🎯" else "Answer submitted",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    if (correct) "Great answer!" else "Thanks for participating.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Row(horizontalAlignment = Alignment.CenterHorizontally, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    BadgePill(
+                        emoji = "💰",
+                        label = if (correct) "+20 pts" else "+5 pts",
+                        accent = ClassroomGreen,
+                        softBackground = ClassroomGreenSoft
+                    )
+                    BadgePill(
+                        emoji = "🏆",
+                        label = "$totalPoints total"
+                    )
+                }
+            }
+        }
     }
 }

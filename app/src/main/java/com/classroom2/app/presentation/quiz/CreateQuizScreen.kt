@@ -2,13 +2,13 @@ package com.classroom2.app.presentation.quiz
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -26,6 +26,11 @@ import com.classroom2.app.presentation.components.OptionCard
 import com.classroom2.app.presentation.components.PrimaryActionButton
 import com.classroom2.app.presentation.components.SecondaryActionButton
 import com.classroom2.app.presentation.components.SectionHeader
+import com.classroom2.app.presentation.components.StatusChip
+import com.classroom2.app.ui.theme.ClassroomOrange
+import com.classroom2.app.ui.theme.ClassroomOrangeSoft
+import com.classroom2.app.ui.theme.ClassroomShapes
+import com.classroom2.app.ui.theme.ClassroomSpacing
 
 @Composable
 fun CreateQuizScreen(
@@ -42,19 +47,30 @@ fun CreateQuizScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = ClassroomSpacing.lg, vertical = ClassroomSpacing.sm),
+            verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.md)
         ) {
             if (activeQuiz != null) {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = ClassroomShapes.Card,
                     color = MaterialTheme.colorScheme.tertiaryContainer
                 ) {
-                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("A quiz is already live", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Column(modifier = Modifier.padding(ClassroomSpacing.md), verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)) {
+                        Row {
+                            StatusChip(
+                                label = "Quiz live",
+                                accent = ClassroomOrange,
+                                softBackground = ClassroomOrangeSoft
+                            )
+                        }
                         Text(
-                            "End it before starting a new one.",
+                            "A quiz is already running",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            "End it from the results screen before starting a new one.",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         SecondaryActionButton(text = "View results", onClick = onStarted)
@@ -68,17 +84,24 @@ fun CreateQuizScreen(
                 onValueChange = vm::onQuestionChange,
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("e.g. What does polymorphism mean in programming?") },
-                minLines = 2
+                minLines = 2,
+                shape = ClassroomShapes.Card
             )
 
-            SectionHeader(title = "Answer options")
+            SectionHeader(title = "Options")
+            Text(
+                "Type each option, then tap one to mark the correct answer.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             state.options.forEachIndexed { index, value ->
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     OutlinedTextField(
                         value = value,
                         onValueChange = { vm.onOptionChange(index, it) },
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Option ${letterFor(index)}") }
+                        label = { Text("Option ${letterFor(index)}") },
+                        shape = ClassroomShapes.Card
                     )
                     OptionCard(
                         letter = letterFor(index),
@@ -92,10 +115,14 @@ fun CreateQuizScreen(
             state.errorMessage?.let { msg ->
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
+                    shape = ClassroomShapes.Card,
                     color = MaterialTheme.colorScheme.errorContainer
                 ) {
-                    Text(msg, modifier = Modifier.padding(16.dp), color = MaterialTheme.colorScheme.onErrorContainer)
+                    Text(
+                        msg,
+                        modifier = Modifier.padding(ClassroomSpacing.md),
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
                 }
             }
 
@@ -109,7 +136,7 @@ fun CreateQuizScreen(
                 enabled = state.canStart && !state.isSubmitting && activeQuiz == null
             )
 
-            Spacer(Modifier.size(16.dp))
+            Spacer(Modifier.size(ClassroomSpacing.md))
         }
     }
 }
