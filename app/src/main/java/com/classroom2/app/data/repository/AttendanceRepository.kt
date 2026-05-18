@@ -159,29 +159,31 @@ class FirestoreAttendanceRepository(
     override suspend fun markAttendance(
         sessionId: String,
         student: User
-    ): AppResult<AttendanceRecord> = try {
-        val sessionRef = db.collection(FirestorePaths.SESSIONS).document(sessionId)
-        val session = sessionRef.get().await().toObject(ClassSession::class.java)
-            ?: return AppResult.Error("This session is no longer active. Ask the professor to start a fresh one.")
-        if (!session.active) return AppResult.Error("The professor ended this session — wait for the next one.")
-        if (session.isExpired) return AppResult.Error("This QR code expired. Ask your professor to generate a fresh one.")
+    ): AppResult<AttendanceRecord> {
+        return try {
+            val sessionRef = db.collection(FirestorePaths.SESSIONS).document(sessionId)
+            val session = sessionRef.get().await().toObject(ClassSession::class.java)
+                ?: return AppResult.Error("This session is no longer active. Ask the professor to start a fresh one.")
+            if (!session.active) return AppResult.Error("The professor ended this session — wait for the next one.")
+            if (session.isExpired) return AppResult.Error("This QR code expired. Ask your professor to generate a fresh one.")
 
-        val attendanceRef = sessionRef
-            .collection(FirestorePaths.ATTENDANCE)
-            .document(student.id)
-        if (attendanceRef.get().await().exists()) {
-            return AppResult.Error("You're already checked in — nice work!")
+            val attendanceRef = sessionRef
+                .collection(FirestorePaths.ATTENDANCE)
+                .document(student.id)
+            if (attendanceRef.get().await().exists()) {
+                return AppResult.Error("You're already checked in — nice work!")
+            }
+            val record = AttendanceRecord(
+                id = student.id,
+                sessionId = sessionId,
+                studentId = student.id,
+                studentName = student.name,
+                timestamp = System.currentTimeMillis()
+            )
+            attendanceRef.set(record).await()
+            AppResult.Success(record)
+        } catch (t: Throwable) {
+            AppResult.Error(t.message ?: "Live sync is unavailable, but demo mode is still ready.")
         }
-        val record = AttendanceRecord(
-            id = student.id,
-            sessionId = sessionId,
-            studentId = student.id,
-            studentName = student.name,
-            timestamp = System.currentTimeMillis()
-        )
-        attendanceRef.set(record).await()
-        AppResult.Success(record)
-    } catch (t: Throwable) {
-        AppResult.Error(t.message ?: "Live sync is unavailable, but demo mode is still ready.")
     }
 }

@@ -1,10 +1,7 @@
 package com.classroom2.app.presentation.attendance
 
-import android.util.Size
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.CameraController
+import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,7 +38,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.classroom2.app.presentation.components.ClassroomTopBar
 import com.classroom2.app.presentation.components.PrimaryActionButton
@@ -213,51 +209,39 @@ private fun CameraPreview(onPayload: (String) -> Unit) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val scanner = remember { BarcodeScanning.getClient() }
     var alreadyHandled by remember { mutableStateOf(false) }
+    val executor = remember { Executors.newSingleThreadExecutor() }
+
+    val controller = remember(lifecycleOwner) {
+        LifecycleCameraController(context).apply {
+            setEnabledUseCases(CameraController.IMAGE_ANALYSIS)
+            setImageAnalysisAnalyzer(executor) { proxy ->
+                val media = proxy.image
+                if (media == null) {
+                    proxy.close()
+                    return@setImageAnalysisAnalyzer
+                }
+                val image = InputImage.fromMediaImage(media, proxy.imageInfo.rotationDegrees)
+                scanner.process(image)
+                    .addOnSuccessListener { codes ->
+                        val raw = codes
+                            .firstOrNull { it.format == Barcode.FORMAT_QR_CODE }
+                            ?.rawValue
+                        if (raw != null && !alreadyHandled) {
+                            alreadyHandled = true
+                            onPayload(raw)
+                        }
+                    }
+                    .addOnCompleteListener { proxy.close() }
+            }
+            try {
+                bindToLifecycle(lifecycleOwner)
+            } catch (_: Throwable) { /* camera unavailable — fallback to Demo Scan */ }
+        }
+    }
 
     AndroidView(
         factory = { ctx ->
-            val previewView = PreviewView(ctx)
-            val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
-            cameraProviderFuture.addListener({
-                val cameraProvider = cameraProviderFuture.get()
-                val preview = Preview.Builder().build().also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
-                }
-                val analyzer = ImageAnalysis.Builder()
-                    .setTargetResolution(Size(1280, 720))
-                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                    .build()
-                val executor = Executors.newSingleThreadExecutor()
-                analyzer.setAnalyzer(executor) { proxy ->
-                    val media = proxy.image
-                    if (media == null) {
-                        proxy.close()
-                        return@setAnalyzer
-                    }
-                    val image = InputImage.fromMediaImage(media, proxy.imageInfo.rotationDegrees)
-                    scanner.process(image)
-                        .addOnSuccessListener { codes ->
-                            val raw = codes
-                                .firstOrNull { it.format == Barcode.FORMAT_QR_CODE }
-                                ?.rawValue
-                            if (raw != null && !alreadyHandled) {
-                                alreadyHandled = true
-                                onPayload(raw)
-                            }
-                        }
-                        .addOnCompleteListener { proxy.close() }
-                }
-                try {
-                    cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(
-                        lifecycleOwner,
-                        CameraSelector.DEFAULT_BACK_CAMERA,
-                        preview,
-                        analyzer
-                    )
-                } catch (_: Throwable) { /* camera unavailable — fallback to Demo Scan */ }
-            }, ContextCompat.getMainExecutor(context))
-            previewView
+            PreviewView(ctx).also { it.controller = controller }
         },
         modifier = Modifier.fillMaxSize()
     )

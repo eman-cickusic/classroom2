@@ -152,7 +152,7 @@ private fun AnswerConfirmation(correct: Boolean, totalPoints: Int) {
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Row(horizontalAlignment = Alignment.CenterHorizontally, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     BadgePill(
                         emoji = "💰",
                         label = if (correct) "+20 pts" else "+5 pts",

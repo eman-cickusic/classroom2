@@ -133,28 +133,30 @@ class FirestoreQuizRepository(
         quiz: Quiz,
         student: User,
         selectedIndex: Int
-    ): AppResult<QuizAnswer> = try {
-        if (!quiz.active) return AppResult.Error("This quiz has ended. Wait for the next live question.")
-        if (selectedIndex !in quiz.options.indices) return AppResult.Error("Pick one of the four options to submit.")
-        val answerRef = db.collection(FirestorePaths.QUIZZES)
-            .document(quiz.id)
-            .collection(FirestorePaths.ANSWERS)
-            .document(student.id)
-        if (answerRef.get().await().exists()) {
-            return AppResult.Error("You already answered — wait for the next question.")
+    ): AppResult<QuizAnswer> {
+        return try {
+            if (!quiz.active) return AppResult.Error("This quiz has ended. Wait for the next live question.")
+            if (selectedIndex !in quiz.options.indices) return AppResult.Error("Pick one of the four options to submit.")
+            val answerRef = db.collection(FirestorePaths.QUIZZES)
+                .document(quiz.id)
+                .collection(FirestorePaths.ANSWERS)
+                .document(student.id)
+            if (answerRef.get().await().exists()) {
+                return AppResult.Error("You already answered — wait for the next question.")
+            }
+            val answer = QuizAnswer(
+                id = student.id,
+                quizId = quiz.id,
+                studentId = student.id,
+                studentName = student.name,
+                selectedIndex = selectedIndex,
+                correct = selectedIndex == quiz.correctAnswerIndex,
+                submittedAt = System.currentTimeMillis()
+            )
+            answerRef.set(answer).await()
+            AppResult.Success(answer)
+        } catch (t: Throwable) {
+            AppResult.Error(t.message ?: "Live sync is unavailable, but demo mode is still ready.")
         }
-        val answer = QuizAnswer(
-            id = student.id,
-            quizId = quiz.id,
-            studentId = student.id,
-            studentName = student.name,
-            selectedIndex = selectedIndex,
-            correct = selectedIndex == quiz.correctAnswerIndex,
-            submittedAt = System.currentTimeMillis()
-        )
-        answerRef.set(answer).await()
-        AppResult.Success(answer)
-    } catch (t: Throwable) {
-        AppResult.Error(t.message ?: "Live sync is unavailable, but demo mode is still ready.")
     }
 }
