@@ -75,8 +75,9 @@ class AttendanceViewModel : ViewModel() {
     fun demoScan() {
         val s = activeSession.value
         if (s == null) {
-            InMemoryStore.lastScanOutcome.value =
-                ScanOutcomeState(error = "No active session — ask the professor to start attendance.")
+            InMemoryStore.lastScanOutcome.value = ScanOutcomeState(
+                error = "Ask the professor to start attendance, then tap Demo scan again."
+            )
             return
         }
         markAttendance(s.id)
@@ -85,12 +86,15 @@ class AttendanceViewModel : ViewModel() {
     fun handleScannedPayload(raw: String) {
         val payload = AttendanceQrPayload.fromJson(raw)
         if (payload == null) {
-            InMemoryStore.lastScanOutcome.value = ScanOutcomeState(error = "Invalid QR code")
+            InMemoryStore.lastScanOutcome.value = ScanOutcomeState(
+                error = "That QR code isn't a Classroom 2.0 session — point at the professor's QR."
+            )
             return
         }
         if (payload.expiresAt < System.currentTimeMillis()) {
-            InMemoryStore.lastScanOutcome.value =
-                ScanOutcomeState(error = "QR code expired — ask professor for a fresh one.")
+            InMemoryStore.lastScanOutcome.value = ScanOutcomeState(
+                error = "This QR code expired. Ask your professor to generate a fresh one."
+            )
             return
         }
         markAttendance(payload.sessionId)

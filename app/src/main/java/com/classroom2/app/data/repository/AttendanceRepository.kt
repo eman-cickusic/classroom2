@@ -71,14 +71,14 @@ class LocalAttendanceRepository : AttendanceRepository {
         student: User
     ): AppResult<AttendanceRecord> {
         val session = InMemoryStore.activeSession.value
-            ?: return AppResult.Error("Session not found")
-        if (session.id != sessionId) return AppResult.Error("Session not found")
-        if (!session.active) return AppResult.Error("Session is no longer active")
-        if (session.isExpired) return AppResult.Error("QR code expired")
+            ?: return AppResult.Error("This session is no longer active. Ask the professor to start a fresh one.")
+        if (session.id != sessionId) return AppResult.Error("This session is no longer active. Ask the professor to start a fresh one.")
+        if (!session.active) return AppResult.Error("The professor ended this session — wait for the next one.")
+        if (session.isExpired) return AppResult.Error("This QR code expired. Ask your professor to generate a fresh one.")
 
         val current = InMemoryStore.attendance.value[sessionId].orEmpty()
         if (current.any { it.studentId == student.id }) {
-            return AppResult.Error("You are already checked in")
+            return AppResult.Error("You're already checked in — nice work!")
         }
         val record = AttendanceRecord(
             id = student.id,
@@ -162,15 +162,15 @@ class FirestoreAttendanceRepository(
     ): AppResult<AttendanceRecord> = try {
         val sessionRef = db.collection(FirestorePaths.SESSIONS).document(sessionId)
         val session = sessionRef.get().await().toObject(ClassSession::class.java)
-            ?: return AppResult.Error("Session not found")
-        if (!session.active) return AppResult.Error("Session is no longer active")
-        if (session.isExpired) return AppResult.Error("QR code expired")
+            ?: return AppResult.Error("This session is no longer active. Ask the professor to start a fresh one.")
+        if (!session.active) return AppResult.Error("The professor ended this session — wait for the next one.")
+        if (session.isExpired) return AppResult.Error("This QR code expired. Ask your professor to generate a fresh one.")
 
         val attendanceRef = sessionRef
             .collection(FirestorePaths.ATTENDANCE)
             .document(student.id)
         if (attendanceRef.get().await().exists()) {
-            return AppResult.Error("You are already checked in")
+            return AppResult.Error("You're already checked in — nice work!")
         }
         val record = AttendanceRecord(
             id = student.id,
@@ -182,6 +182,6 @@ class FirestoreAttendanceRepository(
         attendanceRef.set(record).await()
         AppResult.Success(record)
     } catch (t: Throwable) {
-        AppResult.Error(t.message ?: "Attendance failed")
+        AppResult.Error(t.message ?: "Live sync is unavailable, but demo mode is still ready.")
     }
 }

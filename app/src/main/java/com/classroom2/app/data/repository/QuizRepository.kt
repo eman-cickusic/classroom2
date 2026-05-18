@@ -60,11 +60,11 @@ class LocalQuizRepository : QuizRepository {
         student: User,
         selectedIndex: Int
     ): AppResult<QuizAnswer> {
-        if (!quiz.active) return AppResult.Error("Quiz is closed")
-        if (selectedIndex !in quiz.options.indices) return AppResult.Error("Invalid answer")
+        if (!quiz.active) return AppResult.Error("This quiz has ended. Wait for the next live question.")
+        if (selectedIndex !in quiz.options.indices) return AppResult.Error("Pick one of the four options to submit.")
         val current = InMemoryStore.quizAnswers.value[quiz.id].orEmpty()
         if (current.any { it.studentId == student.id }) {
-            return AppResult.Error("You already answered this quiz")
+            return AppResult.Error("You already answered — wait for the next question.")
         }
         val answer = QuizAnswer(
             id = student.id,
@@ -134,14 +134,14 @@ class FirestoreQuizRepository(
         student: User,
         selectedIndex: Int
     ): AppResult<QuizAnswer> = try {
-        if (!quiz.active) return AppResult.Error("Quiz is closed")
-        if (selectedIndex !in quiz.options.indices) return AppResult.Error("Invalid answer")
+        if (!quiz.active) return AppResult.Error("This quiz has ended. Wait for the next live question.")
+        if (selectedIndex !in quiz.options.indices) return AppResult.Error("Pick one of the four options to submit.")
         val answerRef = db.collection(FirestorePaths.QUIZZES)
             .document(quiz.id)
             .collection(FirestorePaths.ANSWERS)
             .document(student.id)
         if (answerRef.get().await().exists()) {
-            return AppResult.Error("You already answered this quiz")
+            return AppResult.Error("You already answered — wait for the next question.")
         }
         val answer = QuizAnswer(
             id = student.id,
@@ -155,6 +155,6 @@ class FirestoreQuizRepository(
         answerRef.set(answer).await()
         AppResult.Success(answer)
     } catch (t: Throwable) {
-        AppResult.Error(t.message ?: "Submit failed")
+        AppResult.Error(t.message ?: "Live sync is unavailable, but demo mode is still ready.")
     }
 }
