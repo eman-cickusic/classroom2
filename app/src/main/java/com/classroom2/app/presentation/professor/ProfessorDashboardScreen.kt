@@ -1,5 +1,9 @@
 package com.classroom2.app.presentation.professor
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,28 +11,48 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.LibraryBooks
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.classroom2.app.data.remote.InMemoryStore
 import com.classroom2.app.data.remote.ServiceLocator
-import com.classroom2.app.presentation.components.ClassroomCard
+import com.classroom2.app.presentation.components.ActionCard
+import com.classroom2.app.presentation.components.AnimatedCounter
+import com.classroom2.app.presentation.components.DashboardHeroCard
+import com.classroom2.app.presentation.components.DemoModeBanner
+import com.classroom2.app.presentation.components.MetricCard
 import com.classroom2.app.presentation.components.SecondaryActionButton
 import com.classroom2.app.presentation.components.SectionHeader
-import com.classroom2.app.presentation.components.StatCard
+import com.classroom2.app.presentation.components.StatusChip
 import com.classroom2.app.ui.theme.ClassroomGreen
 import com.classroom2.app.ui.theme.ClassroomGreenSoft
 import com.classroom2.app.ui.theme.ClassroomOrange
 import com.classroom2.app.ui.theme.ClassroomOrangeSoft
 import com.classroom2.app.ui.theme.ClassroomPurple
 import com.classroom2.app.ui.theme.ClassroomPurpleSoft
+import com.classroom2.app.ui.theme.ClassroomSpacing
+import com.classroom2.app.util.TimeUtil
 
 @Composable
 fun ProfessorDashboardScreen(
@@ -43,108 +67,188 @@ fun ProfessorDashboardScreen(
     val activeSession by InMemoryStore.activeSession.collectAsState()
     val attendance by InMemoryStore.attendance.collectAsState()
     val activeQuiz by InMemoryStore.activeQuiz.collectAsState()
+    val sessionHistory by InMemoryStore.sessionHistory.collectAsState()
 
     val presentCount = activeSession?.let { attendance[it.id]?.size } ?: 0
+
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(bottom = ClassroomSpacing.lg)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(
-                    "Good morning, Professor",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+        AnimatedVisibility(visible, enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 12 }) {
+            Column(
+                modifier = Modifier.padding(horizontal = ClassroomSpacing.lg, vertical = ClassroomSpacing.md),
+                verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.md)
+            ) {
+                DashboardHeroCard(
+                    eyebrow = "Good morning",
+                    title = professor.name,
+                    subtitle = "Ready to make today's class interactive?",
+                    trailing = {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            DemoModeBanner()
+                        }
+                    },
+                    metrics = {
+                        Row(horizontalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)) {
+                            HeroMetric(
+                                label = "Present",
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                AnimatedCounter(
+                                    value = presentCount,
+                                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                                    color = Color.White
+                                )
+                            }
+                            HeroMetricText(
+                                label = "Active quiz",
+                                value = if (activeQuiz != null) "Live" else "—",
+                                modifier = Modifier.weight(1f)
+                            )
+                            HeroMetricText(
+                                label = "Engagement",
+                                value = "92%",
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
                 )
-                Text(
-                    professor.name,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (activeSession != null) {
+                        StatusChip(
+                            label = "Attendance live",
+                            accent = ClassroomGreen,
+                            softBackground = ClassroomGreenSoft
+                        )
+                    }
+                    if (activeQuiz != null) {
+                        StatusChip(
+                            label = "Quiz live",
+                            accent = ClassroomOrange,
+                            softBackground = ClassroomOrangeSoft
+                        )
+                    }
+                    Spacer(Modifier.weight(1f))
+                    SecondaryActionButton(
+                        text = "🎒 Student view",
+                        onClick = onSwitchRole,
+                        modifier = Modifier.fillMaxWidth(0.42f)
+                    )
+                }
+
+                SectionHeader(title = "Quick actions")
+
+                ActionCard(
+                    title = "Start attendance",
+                    subtitle = if (activeSession != null) "Session live — tap to view QR"
+                               else "Generate a QR for students to scan",
+                    icon = Icons.Filled.QrCode2,
+                    onClick = onStartAttendance
                 )
-                Text(
-                    "Computer Science 101",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                ActionCard(
+                    title = "Start live quiz",
+                    subtitle = if (activeQuiz != null) "Quiz active — view answers"
+                               else "Ask one quick question, see live answers",
+                    icon = Icons.Filled.QuestionAnswer,
+                    accent = ClassroomPurple,
+                    accentContainer = ClassroomPurpleSoft,
+                    onClick = onStartQuiz
                 )
+                ActionCard(
+                    title = "Teaching insight",
+                    subtitle = "Class understanding + recommended next step",
+                    icon = Icons.Filled.AutoAwesome,
+                    accent = ClassroomGreen,
+                    accentContainer = ClassroomGreenSoft,
+                    onClick = onOpenInsights
+                )
+                ActionCard(
+                    title = "Leaderboard",
+                    subtitle = "See who's leading the class",
+                    icon = Icons.Filled.EmojiEvents,
+                    accent = ClassroomOrange,
+                    accentContainer = ClassroomOrangeSoft,
+                    onClick = onOpenLeaderboard
+                )
+                ActionCard(
+                    title = "Attendance history",
+                    subtitle = "Review past sessions",
+                    icon = Icons.Filled.History,
+                    onClick = onOpenHistory
+                )
+
+                SectionHeader(title = "Recent activity")
+
+                Row(horizontalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)) {
+                    val lastSession = sessionHistory.firstOrNull() ?: activeSession
+                    MetricCard(
+                        label = "Last session",
+                        value = lastSession?.let { TimeUtil.formatShortTime(it.createdAt) } ?: "—",
+                        modifier = Modifier.weight(1f)
+                    )
+                    MetricCard(
+                        label = "Quiz answers",
+                        value = (InMemoryStore.quizAnswers.value.values.flatten().size).toString(),
+                        modifier = Modifier.weight(1f),
+                        accent = ClassroomPurple,
+                        softBackground = ClassroomPurpleSoft
+                    )
+                    MetricCard(
+                        label = "Sessions",
+                        value = sessionHistory.size.toString(),
+                        modifier = Modifier.weight(1f),
+                        accent = ClassroomGreen,
+                        softBackground = ClassroomGreenSoft
+                    )
+                }
+
+                if (sessionHistory.isEmpty() && activeSession == null) {
+                    Text(
+                        "Start your first attendance session to see activity here.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
-            SecondaryActionButton(
-                text = "🎒 Student view",
-                onClick = onSwitchRole,
-                modifier = Modifier.fillMaxWidth(0.4f)
-            )
         }
+    }
+}
 
+@Composable
+private fun HeroMetric(
+    label: String,
+    modifier: Modifier = Modifier,
+    valueContent: @Composable () -> Unit
+) {
+    Column(modifier = modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(
-            "Ready to make today's class interactive?",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            label.uppercase(),
+            color = Color.White.copy(alpha = 0.78f),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.SemiBold
         )
+        valueContent()
+    }
+}
 
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatCard(
-                label = "Present",
-                value = presentCount.toString(),
-                modifier = Modifier.weight(1f),
-                accent = ClassroomGreen,
-                softBackground = ClassroomGreenSoft
-            )
-            StatCard(
-                label = "Active quiz",
-                value = if (activeQuiz != null) "Live" else "—",
-                modifier = Modifier.weight(1f),
-                accent = ClassroomOrange,
-                softBackground = ClassroomOrangeSoft
-            )
-            StatCard(
-                label = "Engagement",
-                value = "92%",
-                modifier = Modifier.weight(1f),
-                accent = ClassroomPurple,
-                softBackground = ClassroomPurpleSoft
-            )
-        }
-
-        Spacer(Modifier.size(4.dp))
-        SectionHeader(title = "Quick actions")
-
-        ClassroomCard(
-            title = "Start attendance",
-            subtitle = if (activeSession != null) "Session live — tap to view QR"
-                       else "Generate a QR for students to scan",
-            leadingEmoji = "🟢",
-            onClick = onStartAttendance
-        )
-        ClassroomCard(
-            title = "Start live quiz",
-            subtitle = if (activeQuiz != null) "Quiz active — view answers"
-                       else "Ask one quick question, see live answers",
-            leadingEmoji = "❓",
-            onClick = onStartQuiz
-        )
-        ClassroomCard(
-            title = "View insights",
-            subtitle = "Class understanding + recommended next step",
-            leadingEmoji = "📊",
-            onClick = onOpenInsights
-        )
-        ClassroomCard(
-            title = "Leaderboard",
-            subtitle = "See who's leading the class",
-            leadingEmoji = "🏆",
-            onClick = onOpenLeaderboard
-        )
-        ClassroomCard(
-            title = "Attendance history",
-            subtitle = "Past sessions saved here",
-            leadingEmoji = "🗂️",
-            onClick = onOpenHistory
+@Composable
+private fun HeroMetricText(label: String, value: String, modifier: Modifier = Modifier) {
+    HeroMetric(label = label, modifier = modifier) {
+        Text(
+            value,
+            color = Color.White,
+            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
         )
     }
 }
