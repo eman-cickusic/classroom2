@@ -64,7 +64,7 @@ fun AIExplainerScreen(onBack: () -> Unit) {
 
             SectionHeader(title = "Explanation style")
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ExplanationMode.values().forEach { m ->
+                ExplanationMode.entries.forEach { m ->
                     FilterChip(
                         selected = mode == m,
                         onClick = { mode = m },

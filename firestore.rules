@@ -1,0 +1,22 @@
+rules_version = '2';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Hackathon-mode rules — PERMISSIVE.
+// Suitable for a 2-minute demo. NOT suitable for production.
+//
+// Production hardening backlog (per docs/handoff/06_FIREBASE_AND_DATA_SPEC.md):
+//   • Require Firebase Auth.
+//   • Validate professor ownership of sessions and quizzes.
+//   • Validate student enrollment in the class.
+//   • Use request.time for server-side timestamps.
+//   • Rotate QR every 30–60s + Cloud Function attendance writes.
+//   • Move point updates behind Cloud Functions so clients can't inflate scores.
+// ─────────────────────────────────────────────────────────────────────────────
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
