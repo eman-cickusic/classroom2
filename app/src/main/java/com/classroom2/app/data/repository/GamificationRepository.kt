@@ -20,11 +20,13 @@ class GamificationRepository {
     fun observeCurrentStudent(): Flow<User> = InMemoryStore.currentStudent
 
     fun awardAttendance(student: User): User {
+        val newStreak = student.streak + 1
         val newPoints = student.points + POINTS_ATTENDANCE + POINTS_STREAK_BONUS
         val newBadges = student.badges.toMutableList().also {
             if (Badge.FirstCheckIn.title !in it) it += Badge.FirstCheckIn.title
+            if (newStreak >= 3 && Badge.StreakBuilder.title !in it) it += Badge.StreakBuilder.title
         }
-        val updated = student.copy(points = newPoints, streak = student.streak + 1, badges = newBadges)
+        val updated = student.copy(points = newPoints, streak = newStreak, badges = newBadges)
         commit(updated)
         return updated
     }
@@ -34,7 +36,8 @@ class GamificationRepository {
         if (correct) added += POINTS_CORRECT_ANSWER
         val newBadges = student.badges.toMutableList().also {
             if (Badge.QuizStarter.title !in it) it += Badge.QuizStarter.title
-            if (correct && Badge.SharpMind.title !in it) it += Badge.SharpMind.title
+            if (correct && Badge.PerfectAnswer.title !in it) it += Badge.PerfectAnswer.title
+            if (correct && Badge.QuickThinker.title !in it) it += Badge.QuickThinker.title
         }
         val updated = student.copy(points = student.points + added, badges = newBadges)
         commit(updated)

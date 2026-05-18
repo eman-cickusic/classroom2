@@ -225,12 +225,5 @@ fun StudentDashboardScreen(
     }
 }
 
-private fun badgeEmoji(name: String): String = when (name) {
-    "First Check-In" -> "🔑"
-    "Quiz Starter" -> "🎯"
-    "Sharp Mind" -> "🧠"
-    "Streak Hero", "Streak Builder" -> "🔥"
-    "Quick Thinker" -> "⚡"
-    "Perfect Answer" -> "💯"
-    else -> "🏅"
-}
+private fun badgeEmoji(name: String): String =
+    com.classroom2.app.domain.model.Badge.emojiFor(name)
