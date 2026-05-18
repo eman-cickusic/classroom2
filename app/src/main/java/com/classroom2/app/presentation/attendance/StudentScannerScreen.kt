@@ -10,13 +10,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -42,6 +46,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.classroom2.app.presentation.components.ClassroomTopBar
 import com.classroom2.app.presentation.components.PrimaryActionButton
 import com.classroom2.app.presentation.components.SecondaryActionButton
+import com.classroom2.app.presentation.components.StatusChip
+import com.classroom2.app.ui.theme.ClassroomGreen
+import com.classroom2.app.ui.theme.ClassroomGreenSoft
+import com.classroom2.app.ui.theme.ClassroomShapes
+import com.classroom2.app.ui.theme.ClassroomSpacing
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -58,6 +67,7 @@ fun StudentScannerScreen(
     vm: AttendanceViewModel = viewModel()
 ) {
     val outcome by vm.scanOutcome.collectAsState()
+    val activeSession by vm.activeSession.collectAsState()
     val cameraPermission = rememberPermissionState(android.Manifest.permission.CAMERA)
     var manualPayload by remember { mutableStateOf("") }
 
@@ -75,11 +85,24 @@ fun StudentScannerScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = ClassroomSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.md)
         ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (activeSession != null) {
+                    StatusChip(
+                        label = "Session live",
+                        accent = ClassroomGreen,
+                        softBackground = ClassroomGreenSoft
+                    )
+                } else {
+                    StatusChip(label = "Waiting for professor")
+                }
+            }
+
             Text(
-                "Point your camera at the professor's QR code, or use Demo Scan below.",
+                "Point your camera at the professor's QR, or use Demo Scan below.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -88,37 +111,59 @@ fun StudentScannerScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .clip(RoundedCornerShape(22.dp))
+                    .clip(ClassroomShapes.LargeCard)
                     .background(Color.Black)
             ) {
                 if (cameraPermission.status.isGranted) {
                     CameraPreview(onPayload = { vm.handleScannedPayload(it) })
+                    // viewfinder frame overlay
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(ClassroomSpacing.xl)
+                            .clip(ClassroomShapes.Card)
+                            .background(Color.Transparent)
+                    )
                 } else {
                     Column(
-                        modifier = Modifier.fillMaxSize().padding(24.dp),
-                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(ClassroomSpacing.lg),
+                        verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("📷", style = MaterialTheme.typography.displayLarge, color = Color.White)
+                        Spacer(Modifier.weight(1f))
+                        Box(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .background(Color.White.copy(alpha = 0.12f), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("📷", style = MaterialTheme.typography.displayMedium)
+                        }
                         Text(
-                            "Camera permission needed",
+                            "Camera off",
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.White,
                             fontWeight = FontWeight.SemiBold
                         )
                         Text(
-                            "Allow camera, or use Demo Scan below.",
+                            "Use Demo Scan below — same flow, no camera required.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.White.copy(alpha = 0.8f)
                         )
+                        Spacer(Modifier.weight(1f))
                     }
                 }
             }
 
-            PrimaryActionButton(text = "🎯 Demo Scan", onClick = { vm.demoScan() })
+            PrimaryActionButton(
+                text = "🎯 Demo scan (works without camera)",
+                onClick = { vm.demoScan() }
+            )
 
             SecondaryActionButton(
-                text = "Open camera permission",
+                text = "Enable camera",
                 onClick = { cameraPermission.launchPermissionRequest() },
                 enabled = !cameraPermission.status.isGranted
             )
@@ -130,7 +175,8 @@ fun StudentScannerScreen(
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("QR JSON payload") },
                 singleLine = false,
-                minLines = 2
+                minLines = 2,
+                shape = ClassroomShapes.Card
             )
             SecondaryActionButton(
                 text = "Submit pasted payload",
@@ -144,18 +190,19 @@ fun StudentScannerScreen(
             outcome?.error?.let { msg ->
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
+                    shape = ClassroomShapes.Card,
                     color = MaterialTheme.colorScheme.errorContainer
                 ) {
                     Text(
                         msg,
-                        modifier = Modifier.padding(16.dp),
-                        color = MaterialTheme.colorScheme.onErrorContainer
+                        modifier = Modifier.padding(ClassroomSpacing.md),
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(ClassroomSpacing.md))
         }
     }
 }

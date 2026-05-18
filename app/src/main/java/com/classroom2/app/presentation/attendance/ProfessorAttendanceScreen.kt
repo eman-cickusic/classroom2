@@ -1,5 +1,9 @@
 package com.classroom2.app.presentation.attendance
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,10 +18,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -39,14 +43,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.classroom2.app.domain.model.AttendanceRecord
-import com.classroom2.app.presentation.components.ClassroomCard
+import com.classroom2.app.presentation.components.AnimatedCounter
 import com.classroom2.app.presentation.components.ClassroomTopBar
-import com.classroom2.app.presentation.components.EmptyState
+import com.classroom2.app.presentation.components.EmptyStateCard
 import com.classroom2.app.presentation.components.PrimaryActionButton
 import com.classroom2.app.presentation.components.SecondaryActionButton
 import com.classroom2.app.presentation.components.SectionHeader
+import com.classroom2.app.presentation.components.StatusChip
 import com.classroom2.app.ui.theme.ClassroomGreen
 import com.classroom2.app.ui.theme.ClassroomGreenSoft
+import com.classroom2.app.ui.theme.ClassroomOrange
+import com.classroom2.app.ui.theme.ClassroomOrangeSoft
+import com.classroom2.app.ui.theme.ClassroomShapes
+import com.classroom2.app.ui.theme.ClassroomSpacing
 import com.classroom2.app.util.QRCodeUtil
 import com.classroom2.app.util.TimeUtil
 import kotlinx.coroutines.delay
@@ -74,62 +83,151 @@ fun ProfessorAttendanceScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        ClassroomTopBar(title = "QR Attendance", onBack = onBack)
+        ClassroomTopBar(title = "QR attendance", onBack = onBack)
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = ClassroomSpacing.lg, vertical = ClassroomSpacing.sm),
+            verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.md)
         ) {
             val payload = vm.currentQrPayload()
 
-            ClassroomCard(
-                title = "Computer Science 101",
-                subtitle = if (session != null)
-                    "Session live • ${TimeUtil.formatCountdown((session.expiresAt - now).coerceAtLeast(0))} remaining"
-                else "No active session"
+            // Premium QR card
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = ClassroomShapes.Qr,
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 2.dp
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f)
-                        .background(Color.White, RoundedCornerShape(20.dp))
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
+                Column(
+                    modifier = Modifier.padding(ClassroomSpacing.lg),
+                    verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.md)
                 ) {
-                    if (payload != null) {
-                        val bitmap = remember(payload) { QRCodeUtil.generateImageBitmap(payload, 1024) }
-                        Image(
-                            bitmap = bitmap,
-                            contentDescription = "Attendance QR",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Fit
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            Text(
+                                "Computer Science 101",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                "Tap any student's phone to check in",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        if (session != null) {
+                            StatusChip(
+                                label = "Active • ${TimeUtil.formatCountdown((session.expiresAt - now).coerceAtLeast(0))}",
+                                accent = ClassroomGreen,
+                                softBackground = ClassroomGreenSoft
+                            )
+                        } else {
+                            StatusChip(
+                                label = "Idle",
+                                accent = ClassroomOrange,
+                                softBackground = ClassroomOrangeSoft
+                            )
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .background(Color.White, ClassroomShapes.Qr)
+                            .padding(ClassroomSpacing.md),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (payload != null) {
+                            val bitmap = remember(payload) { QRCodeUtil.generateImageBitmap(payload, 1024) }
+                            Image(
+                                bitmap = bitmap,
+                                contentDescription = "Attendance QR",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
+                            )
+                        } else {
+                            Text(
+                                "Generating QR…",
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Outlined.Lock,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(16.dp)
                         )
-                    } else {
                         Text(
-                            "Generating QR…",
-                            textAlign = TextAlign.Center,
+                            "Session-specific QR expires automatically.",
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    StatPill(
-                        label = "Present",
-                        value = state.records.size.toString(),
-                        modifier = Modifier.weight(1f)
-                    )
-                    StatPill(
-                        label = "Expected",
-                        value = vm.expectedClassSize.toString(),
-                        modifier = Modifier.weight(1f)
-                    )
+            }
+
+            // Present count + Expected
+            Row(horizontalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)) {
+                Surface(
+                    modifier = Modifier.weight(1f),
+                    shape = ClassroomShapes.Card,
+                    color = ClassroomGreenSoft
+                ) {
+                    Column(modifier = Modifier.padding(ClassroomSpacing.md), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            "PRESENT",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = ClassroomGreen,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        AnimatedCounter(
+                            value = state.records.size,
+                            style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
+                            color = ClassroomGreen
+                        )
+                    }
+                }
+                Surface(
+                    modifier = Modifier.weight(1f),
+                    shape = ClassroomShapes.Card,
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 1.dp
+                ) {
+                    Column(modifier = Modifier.padding(ClassroomSpacing.md), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            "EXPECTED",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            vm.expectedClassSize.toString(),
+                            style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
                 }
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)
+            ) {
                 if (session == null) {
                     PrimaryActionButton(
                         text = "Start session",
@@ -162,47 +260,27 @@ fun ProfessorAttendanceScreen(
             SectionHeader(title = "Live check-ins")
 
             if (state.records.isEmpty()) {
-                EmptyState(
+                EmptyStateCard(
                     title = "No students yet",
-                    message = "Share the QR code and students will appear here in real time.",
+                    message = "Keep the QR visible and check-ins will appear live.",
                     emoji = "📭"
                 )
             } else {
-                LiveAttendanceList(state.records)
+                Column(verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)) {
+                    state.records.forEachIndexed { index, record ->
+                        AnimatedVisibility(
+                            visible = true,
+                            enter = fadeIn(tween(220, delayMillis = index * 40)) +
+                                slideInVertically(tween(220, delayMillis = index * 40)) { it / 6 }
+                        ) {
+                            AttendanceRow(record)
+                        }
+                    }
+                }
             }
 
-            Spacer(Modifier.size(16.dp))
+            Spacer(Modifier.size(ClassroomSpacing.md))
         }
-    }
-}
-
-@Composable
-private fun StatPill(label: String, value: String, modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        color = ClassroomGreenSoft
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp)
-        ) {
-            Text(
-                label.uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                color = ClassroomGreen,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(value, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-        }
-    }
-}
-
-@Composable
-private fun LiveAttendanceList(records: List<AttendanceRecord>) {
-    // Use Column instead of LazyColumn inside a verticalScroll parent.
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        records.forEach { r -> AttendanceRow(r) }
     }
 }
 
@@ -210,32 +288,41 @@ private fun LiveAttendanceList(records: List<AttendanceRecord>) {
 private fun AttendanceRow(record: AttendanceRecord) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
+        shape = ClassroomShapes.Card,
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 1.dp
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier.padding(horizontal = ClassroomSpacing.md, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm + 4.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(40.dp)
                     .background(ClassroomGreen, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Filled.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+                Icon(Icons.Filled.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(22.dp))
             }
             Column(modifier = Modifier.weight(1f)) {
-                Text(record.studentName.ifBlank { "Student" }, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                Text(
+                    record.studentName.ifBlank { "Student" },
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
                 Text(
                     "Checked in at ${TimeUtil.formatTime(record.timestamp)}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            Text("✅", style = MaterialTheme.typography.titleMedium)
+            StatusChip(
+                label = "+10 pts",
+                accent = ClassroomGreen,
+                softBackground = ClassroomGreenSoft,
+                showDot = false
+            )
         }
     }
 }
