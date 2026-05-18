@@ -1,5 +1,6 @@
 package com.classroom2.app.util
 
+import com.classroom2.app.domain.model.ClassSession
 import com.classroom2.app.domain.model.LeaderboardEntry
 import com.classroom2.app.domain.model.Quiz
 import com.classroom2.app.domain.model.User
@@ -52,6 +53,34 @@ object DemoData {
             points = u.points,
             streak = u.streak,
             badges = u.badges
+        )
+    }
+
+    /** Two completed sessions so the attendance history screen is screenshot-ready on first launch. */
+    val seedSessionHistory: List<ClassSession> = run {
+        val now = System.currentTimeMillis()
+        val day = 24L * 60 * 60 * 1000
+        listOf(
+            ClassSession(
+                id = "session-history-1",
+                professorId = professor.id,
+                classId = CLASS_ID,
+                classTitle = CLASS_TITLE,
+                createdAt = now - day,
+                expiresAt = now - day + 5 * 60 * 1000,
+                active = false,
+                presentCount = 5
+            ),
+            ClassSession(
+                id = "session-history-2",
+                professorId = professor.id,
+                classId = CLASS_ID,
+                classTitle = CLASS_TITLE,
+                createdAt = now - 3 * day,
+                expiresAt = now - 3 * day + 5 * 60 * 1000,
+                active = false,
+                presentCount = 6
+            )
         )
     }
 }

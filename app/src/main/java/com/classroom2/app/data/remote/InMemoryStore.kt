@@ -34,7 +34,8 @@ data class QuizSubmissionState(
  */
 object InMemoryStore {
     val activeSession: MutableStateFlow<ClassSession?> = MutableStateFlow(null)
-    val sessionHistory: MutableStateFlow<List<ClassSession>> = MutableStateFlow(emptyList())
+    val sessionHistory: MutableStateFlow<List<ClassSession>> =
+        MutableStateFlow(DemoData.seedSessionHistory)
     val attendance: MutableStateFlow<Map<String, List<AttendanceRecord>>> =
         MutableStateFlow(emptyMap())
 
