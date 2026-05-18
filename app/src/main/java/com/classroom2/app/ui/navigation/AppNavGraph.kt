@@ -17,6 +17,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.classroom2.app.data.remote.ServiceLocator
 import com.classroom2.app.domain.model.UserRole
+import com.classroom2.app.presentation.attendance.AttendanceSuccessScreen
+import com.classroom2.app.presentation.attendance.ProfessorAttendanceScreen
+import com.classroom2.app.presentation.attendance.StudentScannerScreen
 import com.classroom2.app.presentation.onboarding.RoleSelectionScreen
 import com.classroom2.app.presentation.professor.ProfessorDashboardScreen
 import com.classroom2.app.presentation.student.StudentDashboardScreen
@@ -58,9 +61,31 @@ fun AppNavGraph() {
             )
         }
 
-        comingSoon(Routes.PROFESSOR_ATTENDANCE, "QR attendance")
-        comingSoon(Routes.STUDENT_SCANNER, "Student scanner")
-        comingSoon(Routes.ATTENDANCE_SUCCESS, "Attendance success")
+        composable(Routes.PROFESSOR_ATTENDANCE) {
+            ProfessorAttendanceScreen(
+                onBack = { navController.popBackStack() },
+                onEnded = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.STUDENT_SCANNER) {
+            StudentScannerScreen(
+                onBack = { navController.popBackStack() },
+                onScanned = {
+                    navController.navigate(Routes.ATTENDANCE_SUCCESS) {
+                        popUpTo(Routes.STUDENT_SCANNER) { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable(Routes.ATTENDANCE_SUCCESS) {
+            AttendanceSuccessScreen(
+                onBackToDashboard = {
+                    navController.navigate(Routes.STUDENT_DASHBOARD) {
+                        popUpTo(Routes.STUDENT_DASHBOARD) { inclusive = true }
+                    }
+                }
+            )
+        }
         comingSoon(Routes.CREATE_QUIZ, "Create quiz")
         comingSoon(Routes.STUDENT_QUIZ, "Student quiz")
         comingSoon(Routes.QUIZ_RESULTS, "Quiz results")

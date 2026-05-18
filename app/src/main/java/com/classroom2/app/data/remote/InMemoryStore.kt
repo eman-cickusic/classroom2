@@ -9,6 +9,25 @@ import com.classroom2.app.domain.model.User
 import com.classroom2.app.util.DemoData
 import kotlinx.coroutines.flow.MutableStateFlow
 
+data class ScanOutcomeState(
+    val recordId: String? = null,
+    val studentName: String = "",
+    val error: String? = null,
+    val totalPoints: Int = 0,
+    val streak: Int = 0
+) {
+    val isSuccess: Boolean get() = recordId != null
+}
+
+data class QuizSubmissionState(
+    val quizId: String? = null,
+    val correct: Boolean = false,
+    val error: String? = null,
+    val totalPoints: Int = 0
+) {
+    val isSuccess: Boolean get() = quizId != null && error == null
+}
+
 /**
  * Single source of truth for the in-memory backend. Mirrors the Firestore schema
  * so the local repos and Firestore repos can swap behind the same interfaces.
@@ -29,4 +48,10 @@ object InMemoryStore {
 
     val currentStudent: MutableStateFlow<User> = MutableStateFlow(DemoData.student)
     val currentProfessor: MutableStateFlow<User> = MutableStateFlow(DemoData.professor)
+
+    /** Cross-screen scan outcome — consumed by AttendanceSuccessScreen, cleared on dispose. */
+    val lastScanOutcome: MutableStateFlow<ScanOutcomeState?> = MutableStateFlow(null)
+
+    /** Cross-screen quiz submission outcome — consumed by quiz confirmation UI. */
+    val lastQuizOutcome: MutableStateFlow<QuizSubmissionState?> = MutableStateFlow(null)
 }
