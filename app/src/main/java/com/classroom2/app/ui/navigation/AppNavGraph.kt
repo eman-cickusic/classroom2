@@ -21,6 +21,9 @@ import com.classroom2.app.presentation.attendance.AttendanceSuccessScreen
 import com.classroom2.app.presentation.attendance.ProfessorAttendanceScreen
 import com.classroom2.app.presentation.attendance.StudentScannerScreen
 import com.classroom2.app.presentation.onboarding.RoleSelectionScreen
+import com.classroom2.app.presentation.quiz.CreateQuizScreen
+import com.classroom2.app.presentation.quiz.QuizResultsScreen
+import com.classroom2.app.presentation.quiz.StudentQuizScreen
 import com.classroom2.app.presentation.professor.ProfessorDashboardScreen
 import com.classroom2.app.presentation.student.StudentDashboardScreen
 
@@ -86,9 +89,25 @@ fun AppNavGraph() {
                 }
             )
         }
-        comingSoon(Routes.CREATE_QUIZ, "Create quiz")
-        comingSoon(Routes.STUDENT_QUIZ, "Student quiz")
-        comingSoon(Routes.QUIZ_RESULTS, "Quiz results")
+        composable(Routes.CREATE_QUIZ) {
+            CreateQuizScreen(
+                onBack = { navController.popBackStack() },
+                onStarted = {
+                    navController.navigate(Routes.QUIZ_RESULTS) {
+                        popUpTo(Routes.CREATE_QUIZ) { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable(Routes.STUDENT_QUIZ) {
+            StudentQuizScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Routes.QUIZ_RESULTS) {
+            QuizResultsScreen(
+                onBack = { navController.popBackStack() },
+                onOpenInsight = { navController.navigate(Routes.INSIGHT_DASHBOARD) }
+            )
+        }
         comingSoon(Routes.INSIGHT_DASHBOARD, "Insight dashboard")
         comingSoon(Routes.AI_EXPLAINER, "AI explainer")
         comingSoon(Routes.LEADERBOARD, "Leaderboard")
