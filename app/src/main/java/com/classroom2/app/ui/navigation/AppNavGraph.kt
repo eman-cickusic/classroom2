@@ -1,30 +1,24 @@
 package com.classroom2.app.ui.navigation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.classroom2.app.data.remote.ServiceLocator
 import com.classroom2.app.domain.model.UserRole
+import com.classroom2.app.presentation.ai.AIExplainerScreen
 import com.classroom2.app.presentation.attendance.AttendanceSuccessScreen
 import com.classroom2.app.presentation.attendance.ProfessorAttendanceScreen
 import com.classroom2.app.presentation.attendance.StudentScannerScreen
+import com.classroom2.app.presentation.history.AttendanceHistoryScreen
+import com.classroom2.app.presentation.insight.InsightDashboardScreen
+import com.classroom2.app.presentation.leaderboard.LeaderboardScreen
 import com.classroom2.app.presentation.onboarding.RoleSelectionScreen
+import com.classroom2.app.presentation.professor.ProfessorDashboardScreen
 import com.classroom2.app.presentation.quiz.CreateQuizScreen
 import com.classroom2.app.presentation.quiz.QuizResultsScreen
 import com.classroom2.app.presentation.quiz.StudentQuizScreen
-import com.classroom2.app.presentation.professor.ProfessorDashboardScreen
 import com.classroom2.app.presentation.student.StudentDashboardScreen
 
 @Composable
@@ -108,11 +102,21 @@ fun AppNavGraph() {
                 onOpenInsight = { navController.navigate(Routes.INSIGHT_DASHBOARD) }
             )
         }
-        comingSoon(Routes.INSIGHT_DASHBOARD, "Insight dashboard")
-        comingSoon(Routes.AI_EXPLAINER, "AI explainer")
-        comingSoon(Routes.LEADERBOARD, "Leaderboard")
-        comingSoon(Routes.ATTENDANCE_HISTORY, "Attendance history")
-        comingSoon(Routes.POINTS, "Points")
+        composable(Routes.INSIGHT_DASHBOARD) {
+            InsightDashboardScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Routes.AI_EXPLAINER) {
+            AIExplainerScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Routes.LEADERBOARD) {
+            LeaderboardScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Routes.ATTENDANCE_HISTORY) {
+            AttendanceHistoryScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Routes.POINTS) {
+            LeaderboardScreen(onBack = { navController.popBackStack() })
+        }
     }
 }
 
@@ -127,16 +131,5 @@ private fun NavHostController.switchTo(role: UserRole) {
     navigate(target) {
         popUpTo(graph.startDestinationId) { inclusive = false }
         launchSingleTop = true
-    }
-}
-
-private fun androidx.navigation.NavGraphBuilder.comingSoon(route: String, label: String) {
-    composable(route) {
-        Box(modifier = Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(label, style = MaterialTheme.typography.headlineMedium)
-                Text("Wired in a later phase.", style = MaterialTheme.typography.bodyMedium)
-            }
-        }
     }
 }
