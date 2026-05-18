@@ -99,13 +99,22 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 
             SectionHeader(title = "Class ranking")
             ranked.forEachIndexed { index, entry ->
-                LeaderboardRow(
-                    rank = index + 1,
-                    name = entry.studentName,
-                    points = entry.points,
-                    streak = entry.streak,
-                    highlight = entry.studentId == student.id
-                )
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = true,
+                    enter = androidx.compose.animation.fadeIn(
+                        androidx.compose.animation.core.tween(260, delayMillis = index * 40)
+                    ) + androidx.compose.animation.slideInVertically(
+                        androidx.compose.animation.core.tween(260, delayMillis = index * 40)
+                    ) { it / 8 }
+                ) {
+                    LeaderboardRow(
+                        rank = index + 1,
+                        name = entry.studentName,
+                        points = entry.points,
+                        streak = entry.streak,
+                        highlight = entry.studentId == student.id
+                    )
+                }
             }
 
             SectionHeader(title = "Badges")
