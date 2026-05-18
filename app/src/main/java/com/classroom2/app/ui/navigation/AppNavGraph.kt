@@ -11,9 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.classroom2.app.data.remote.ServiceLocator
+import com.classroom2.app.domain.model.UserRole
+import com.classroom2.app.presentation.onboarding.RoleSelectionScreen
+import com.classroom2.app.presentation.professor.ProfessorDashboardScreen
+import com.classroom2.app.presentation.student.StudentDashboardScreen
 
 @Composable
 fun AppNavGraph() {
@@ -22,19 +28,71 @@ fun AppNavGraph() {
         navController = navController,
         startDestination = Routes.ROLE_SELECTION
     ) {
-        composable(Routes.ROLE_SELECTION) { PhasePlaceholder("Role selection coming online…") }
+        composable(Routes.ROLE_SELECTION) {
+            RoleSelectionScreen(onContinue = { role ->
+                ServiceLocator.auth.selectRole(role)
+                navController.navigate(role.dashboardRoute()) {
+                    popUpTo(Routes.ROLE_SELECTION) { inclusive = true }
+                }
+            })
+        }
+
+        composable(Routes.PROFESSOR_DASHBOARD) {
+            ProfessorDashboardScreen(
+                onStartAttendance = { navController.navigate(Routes.PROFESSOR_ATTENDANCE) },
+                onStartQuiz = { navController.navigate(Routes.CREATE_QUIZ) },
+                onOpenInsights = { navController.navigate(Routes.INSIGHT_DASHBOARD) },
+                onOpenLeaderboard = { navController.navigate(Routes.LEADERBOARD) },
+                onOpenHistory = { navController.navigate(Routes.ATTENDANCE_HISTORY) },
+                onSwitchRole = { navController.switchTo(UserRole.STUDENT) }
+            )
+        }
+
+        composable(Routes.STUDENT_DASHBOARD) {
+            StudentDashboardScreen(
+                onScan = { navController.navigate(Routes.STUDENT_SCANNER) },
+                onJoinQuiz = { navController.navigate(Routes.STUDENT_QUIZ) },
+                onAIExplainer = { navController.navigate(Routes.AI_EXPLAINER) },
+                onLeaderboard = { navController.navigate(Routes.LEADERBOARD) },
+                onSwitchRole = { navController.switchTo(UserRole.PROFESSOR) }
+            )
+        }
+
+        comingSoon(Routes.PROFESSOR_ATTENDANCE, "QR attendance")
+        comingSoon(Routes.STUDENT_SCANNER, "Student scanner")
+        comingSoon(Routes.ATTENDANCE_SUCCESS, "Attendance success")
+        comingSoon(Routes.CREATE_QUIZ, "Create quiz")
+        comingSoon(Routes.STUDENT_QUIZ, "Student quiz")
+        comingSoon(Routes.QUIZ_RESULTS, "Quiz results")
+        comingSoon(Routes.INSIGHT_DASHBOARD, "Insight dashboard")
+        comingSoon(Routes.AI_EXPLAINER, "AI explainer")
+        comingSoon(Routes.LEADERBOARD, "Leaderboard")
+        comingSoon(Routes.ATTENDANCE_HISTORY, "Attendance history")
+        comingSoon(Routes.POINTS, "Points")
     }
 }
 
-@Composable
-private fun PhasePlaceholder(text: String) {
-    Box(modifier = Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text("Classroom 2.0", style = MaterialTheme.typography.headlineMedium)
-            Text(text, style = MaterialTheme.typography.bodyMedium)
+private fun UserRole.dashboardRoute(): String = when (this) {
+    UserRole.PROFESSOR -> Routes.PROFESSOR_DASHBOARD
+    UserRole.STUDENT -> Routes.STUDENT_DASHBOARD
+}
+
+private fun NavHostController.switchTo(role: UserRole) {
+    ServiceLocator.auth.selectRole(role)
+    val target = role.dashboardRoute()
+    navigate(target) {
+        popUpTo(graph.startDestinationId) { inclusive = false }
+        launchSingleTop = true
+    }
+}
+
+private fun androidx.navigation.NavGraphBuilder.comingSoon(route: String, label: String) {
+    composable(route) {
+        Box(modifier = Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(label, style = MaterialTheme.typography.headlineMedium)
+                Text("Wired in a later phase.", style = MaterialTheme.typography.bodyMedium)
+            }
         }
     }
 }
