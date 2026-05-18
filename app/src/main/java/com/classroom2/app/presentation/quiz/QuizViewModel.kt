@@ -64,13 +64,21 @@ class QuizViewModel : ViewModel() {
             }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    /**
+     * Keep last non-null quiz + last answers so the insight screen still has data
+     * to render after the professor ends the quiz.
+     */
+    private val lastResults = kotlinx.coroutines.flow.MutableStateFlow(QuizResultsUiState())
+
     val resultsState: StateFlow<QuizResultsUiState> =
-        combine(activeQuiz, answers) { q, a ->
-            QuizResultsUiState(
-                quiz = q,
-                answers = a,
-                insight = if (q != null) insightRepo.generate(q, a) else null
-            )
+        combine(activeQuiz, answers, lastResults) { q, a, cached ->
+            if (q != null) {
+                val state = QuizResultsUiState(quiz = q, answers = a, insight = insightRepo.generate(q, a))
+                lastResults.value = state
+                state
+            } else {
+                cached
+            }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), QuizResultsUiState())
 
     val submission: StateFlow<QuizSubmissionState?> = InMemoryStore.lastQuizOutcome
