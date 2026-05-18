@@ -2,14 +2,15 @@ package com.classroom2.app.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val ClassroomColorScheme = lightColorScheme(
-    primary = ClassroomIndigo,
+private val LightColors = lightColorScheme(
+    primary = ClassroomBlue,
     onPrimary = Color.White,
-    primaryContainer = ClassroomIndigoSoft,
+    primaryContainer = ClassroomBlueSoft,
     onPrimaryContainer = ClassroomIndigo,
     secondary = ClassroomPurple,
     onSecondary = Color.White,
@@ -23,7 +24,7 @@ private val ClassroomColorScheme = lightColorScheme(
     onBackground = ClassroomTextPrimary,
     surface = ClassroomSurface,
     onSurface = ClassroomTextPrimary,
-    surfaceVariant = ClassroomSurfaceMuted,
+    surfaceVariant = ClassroomSurfaceSoft,
     onSurfaceVariant = ClassroomTextSecondary,
     outline = ClassroomBorder,
     error = ClassroomRed,
@@ -32,14 +33,41 @@ private val ClassroomColorScheme = lightColorScheme(
     onErrorContainer = ClassroomRed
 )
 
+private val DarkColors = darkColorScheme(
+    primary = ClassroomBlue,
+    onPrimary = Color.White,
+    primaryContainer = ClassroomBlueDarkSoft,
+    onPrimaryContainer = ClassroomBlueSoft,
+    secondary = ClassroomPurple,
+    onSecondary = Color.White,
+    secondaryContainer = ClassroomPurpleDarkSoft,
+    onSecondaryContainer = ClassroomPurpleSoft,
+    tertiary = ClassroomOrange,
+    onTertiary = Color.White,
+    tertiaryContainer = ClassroomOrangeDarkSoft,
+    onTertiaryContainer = ClassroomOrangeSoft,
+    background = ClassroomDarkBackground,
+    onBackground = ClassroomDarkTextPrimary,
+    surface = ClassroomDarkSurface,
+    onSurface = ClassroomDarkTextPrimary,
+    surfaceVariant = ClassroomDarkSurfaceSoft,
+    onSurfaceVariant = ClassroomDarkTextSecondary,
+    outline = ClassroomDarkBorder,
+    error = ClassroomRed,
+    onError = Color.White,
+    errorContainer = ClassroomRedDarkSoft,
+    onErrorContainer = ClassroomRedSoft
+)
+
 @Composable
 fun Classroom2Theme(
-    @Suppress("UNUSED_PARAMETER") darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colorScheme = ClassroomColorScheme,
+        colorScheme = if (darkTheme) DarkColors else LightColors,
         typography = ClassroomTypography,
+        shapes = ClassroomMaterialShapes,
         content = content
     )
 }
