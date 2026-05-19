@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="classroom_indigo">#FF4F46E5</color>
-    <color name="classroom_background">#FFF8FAFC</color>
+    <!-- Matches ClassroomBlue in ui/theme/Color.kt — used by the adaptive launcher icon background. -->
+    <color name="classroom_indigo">#FF3157FF</color>
+    <color name="classroom_background">#FFF7F8FC</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

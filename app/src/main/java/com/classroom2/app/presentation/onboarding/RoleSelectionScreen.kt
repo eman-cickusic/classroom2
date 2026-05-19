@@ -253,7 +253,7 @@ private fun RoleOption(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = if (selected) Color.White else MaterialTheme.colorScheme.primary,
+                    tint = if (selected) Color.White else MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(28.dp)
                 )
             }
