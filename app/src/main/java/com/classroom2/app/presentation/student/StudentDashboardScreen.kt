@@ -23,8 +23,6 @@ import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.QuestionAnswer
-import androidx.compose.material.icons.outlined.School
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.classroom2.app.data.remote.InMemoryStore
+import com.classroom2.app.domain.model.UserRole
 import com.classroom2.app.presentation.components.ActionCard
 import com.classroom2.app.presentation.components.AnimatedCounter
 import com.classroom2.app.presentation.components.BadgePill
@@ -113,23 +112,12 @@ fun StudentDashboardScreen(
                                     )
                                 }
                                 Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = ClassroomIcons.streak,
-                                            contentDescription = null,
-                                            tint = Color.White,
-                                            modifier = Modifier.size(14.dp)
-                                        )
-                                        StatusChip(
-                                            label = "${student.streak} days",
-                                            accent = Color.White,
-                                            softBackground = Color.White.copy(alpha = 0.2f),
-                                            showDot = false
-                                        )
-                                    }
+                                    StatusChip(
+                                        label = "${student.streak} days",
+                                        icon = ClassroomIcons.streak,
+                                        accent = Color.White,
+                                        softBackground = Color.White.copy(alpha = 0.2f)
+                                    )
                                     if (student.badges.isNotEmpty()) {
                                         Text(
                                             "Latest: ${student.badges.last()}",
@@ -186,7 +174,7 @@ fun StudentDashboardScreen(
                     Spacer(Modifier.weight(1f))
                     SecondaryActionButton(
                         text = "Professor view",
-                        icon = Icons.Outlined.School,
+                        icon = ClassroomIcons.role(UserRole.PROFESSOR),
                         onClick = onSwitchRole,
                         modifier = Modifier.fillMaxWidth(0.5f)
                     )

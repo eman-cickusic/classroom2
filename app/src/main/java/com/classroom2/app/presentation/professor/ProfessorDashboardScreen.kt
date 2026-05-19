@@ -16,7 +16,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.Backpack
 import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.QrCode2
@@ -37,6 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.classroom2.app.data.remote.InMemoryStore
 import com.classroom2.app.data.remote.ServiceLocator
+import com.classroom2.app.domain.model.UserRole
+import com.classroom2.app.ui.icons.ClassroomIcons
+import com.classroom2.app.util.DemoData
 import com.classroom2.app.presentation.components.ActionCard
 import com.classroom2.app.presentation.components.AnimatedCounter
 import com.classroom2.app.presentation.components.DashboardHeroCard
@@ -88,7 +90,7 @@ fun ProfessorDashboardScreen(
                 DashboardHeroCard(
                     eyebrow = "Today",
                     title = professor.name,
-                    subtitle = "Computer Science 101 · 32 students",
+                    subtitle = "${DemoData.CLASS_TITLE} · ${DemoData.EXPECTED_CLASS_SIZE} students",
                     trailing = {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             DemoModeBanner()
@@ -142,7 +144,7 @@ fun ProfessorDashboardScreen(
                     Spacer(Modifier.weight(1f))
                     SecondaryActionButton(
                         text = "Student view",
-                        icon = Icons.Outlined.Backpack,
+                        icon = ClassroomIcons.role(UserRole.STUDENT),
                         onClick = onSwitchRole,
                         modifier = Modifier.fillMaxWidth(0.45f)
                     )

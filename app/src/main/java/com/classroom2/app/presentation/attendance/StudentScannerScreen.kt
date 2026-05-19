@@ -5,9 +5,6 @@ import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.material3.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CameraAlt
-import androidx.compose.material.icons.outlined.QrCodeScanner
 import com.classroom2.app.ui.icons.ClassroomIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -141,7 +138,7 @@ fun StudentScannerScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.CameraAlt,
+                                imageVector = ClassroomIcons.cameraOff,
                                 contentDescription = null,
                                 tint = Color.White,
                                 modifier = Modifier.size(36.dp)
@@ -165,7 +162,7 @@ fun StudentScannerScreen(
 
             PrimaryActionButton(
                 text = "Demo scan (works without camera)",
-                icon = Icons.Outlined.QrCodeScanner,
+                icon = ClassroomIcons.scanner,
                 onClick = { vm.demoScan() }
             )
 

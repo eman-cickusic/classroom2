@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -15,16 +16,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+/**
+ * Pill-shaped status indicator. Pass [icon] for a leading vector icon, or rely
+ * on [showDot] for a colored bullet. Setting both prefers the icon.
+ */
 @Composable
 fun StatusChip(
     label: String,
     modifier: Modifier = Modifier,
     accent: Color = MaterialTheme.colorScheme.primary,
     softBackground: Color = MaterialTheme.colorScheme.primaryContainer,
-    showDot: Boolean = true
+    showDot: Boolean = true,
+    icon: ImageVector? = null
 ) {
     Surface(
         modifier = modifier,
@@ -36,8 +43,14 @@ fun StatusChip(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            if (showDot) {
-                Box(modifier = Modifier.size(8.dp).background(accent, CircleShape))
+            when {
+                icon != null -> Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = accent,
+                    modifier = Modifier.size(13.dp)
+                )
+                showDot -> Box(modifier = Modifier.size(8.dp).background(accent, CircleShape))
             }
             Text(
                 text = label,
