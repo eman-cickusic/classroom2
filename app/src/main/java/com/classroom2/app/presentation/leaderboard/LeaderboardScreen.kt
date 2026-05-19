@@ -33,6 +33,7 @@ import com.classroom2.app.data.remote.InMemoryStore
 import com.classroom2.app.domain.model.Badge
 import com.classroom2.app.domain.model.LeaderboardEntry
 import com.classroom2.app.presentation.components.BadgeCard
+import com.classroom2.app.util.TimeUtil
 import com.classroom2.app.presentation.components.ClassroomTopBar
 import com.classroom2.app.presentation.components.LeaderboardRow
 import com.classroom2.app.presentation.components.MetricCard
@@ -85,7 +86,7 @@ fun LeaderboardScreen(onBack: () -> Unit) {
                 )
                 MetricCard(
                     label = "Streak",
-                    value = "${student.streak} days",
+                    value = TimeUtil.pluralize(student.streak, "day"),
                     modifier = Modifier.weight(1f),
                     accent = ClassroomOrange,
                     softBackground = ClassroomOrangeSoft

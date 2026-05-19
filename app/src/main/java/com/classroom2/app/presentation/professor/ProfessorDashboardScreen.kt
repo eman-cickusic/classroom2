@@ -90,7 +90,7 @@ fun ProfessorDashboardScreen(
                 DashboardHeroCard(
                     eyebrow = "Today",
                     title = professor.name,
-                    subtitle = "${DemoData.CLASS_TITLE} · ${DemoData.EXPECTED_CLASS_SIZE} students",
+                    subtitle = "${DemoData.CLASS_TITLE} · ${TimeUtil.pluralize(DemoData.EXPECTED_CLASS_SIZE, "student")}",
                     trailing = {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             DemoModeBanner()

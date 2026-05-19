@@ -48,6 +48,7 @@ import com.classroom2.app.presentation.components.SecondaryActionButton
 import com.classroom2.app.presentation.components.SectionHeader
 import com.classroom2.app.presentation.components.StatusChip
 import com.classroom2.app.ui.icons.ClassroomIcons
+import com.classroom2.app.util.TimeUtil
 import com.classroom2.app.ui.theme.ClassroomGreen
 import com.classroom2.app.ui.theme.ClassroomGreenSoft
 import com.classroom2.app.ui.theme.ClassroomOrange
@@ -89,7 +90,7 @@ fun StudentDashboardScreen(
                 DashboardHeroCard(
                     eyebrow = "Welcome",
                     title = student.name,
-                    subtitle = "Current streak: ${student.streak} classes.",
+                    subtitle = "Current streak: ${TimeUtil.pluralize(student.streak, "class", "classes")}.",
                     trailing = { DemoModeBanner() },
                     metrics = {
                         Column(modifier = Modifier.padding(4.dp), verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)) {
@@ -113,7 +114,7 @@ fun StudentDashboardScreen(
                                 }
                                 Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                     StatusChip(
-                                        label = "${student.streak} days",
+                                        label = TimeUtil.pluralize(student.streak, "day"),
                                         icon = ClassroomIcons.streak,
                                         accent = Color.White,
                                         softBackground = Color.White.copy(alpha = 0.2f)

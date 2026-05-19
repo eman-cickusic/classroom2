@@ -22,4 +22,8 @@ object TimeUtil {
         val ss = total % 60
         return String.format(Locale.getDefault(), "%02d:%02d", mm, ss)
     }
+
+    /** "1 day" / "3 days" — naive English pluralization for product labels. */
+    fun pluralize(count: Int, singular: String, plural: String = singular + "s"): String =
+        "$count ${if (count == 1) singular else plural}"
 }

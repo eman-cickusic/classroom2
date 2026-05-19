@@ -37,8 +37,8 @@ class GamificationRepository {
         val newBadges = student.badges.toMutableList().also {
             if (Badge.QuizStarter.title !in it) it += Badge.QuizStarter.title
             if (correct && Badge.PerfectAnswer.title !in it) it += Badge.PerfectAnswer.title
-            if (correct && Badge.QuickThinker.title !in it) it += Badge.QuickThinker.title
         }
+        // QuickThinker is reserved for a future timer-based trigger.
         val updated = student.copy(points = student.points + added, badges = newBadges)
         commit(updated)
         return updated

@@ -48,6 +48,7 @@ import com.classroom2.app.presentation.components.SectionHeader
 import com.classroom2.app.presentation.components.StatusChip
 import com.classroom2.app.presentation.quiz.QuizViewModel
 import com.classroom2.app.ui.icons.ClassroomIcons
+import com.classroom2.app.util.TimeUtil
 import com.classroom2.app.ui.theme.ClassroomGradientEnd
 import com.classroom2.app.ui.theme.ClassroomGradientStart
 import com.classroom2.app.ui.theme.ClassroomGreen
@@ -97,7 +98,7 @@ fun InsightDashboardScreen(
                     softBackground = ClassroomPurpleSoft
                 )
                 StatusChip(
-                    label = "${insight.totalAnswers} answers",
+                    label = TimeUtil.pluralize(insight.totalAnswers, "answer"),
                     accent = ClassroomGreen,
                     softBackground = ClassroomGreenSoft,
                     showDot = false
