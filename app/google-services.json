@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "000000000000",
-    "project_id": "classroom2-demo-placeholder",
-    "storage_bucket": "classroom2-demo-placeholder.appspot.com"
+    "project_number": "1046194309639",
+    "project_id": "classroom2-bb1e4",
+    "storage_bucket": "classroom2-bb1e4.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "mobilesdk_app_id": "1:1046194309639:android:a3101e7cd5fbdfd287b8a2",
         "android_client_info": {
           "package_name": "com.classroom2.app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSy_PLACEHOLDER_REPLACE_WITH_REAL_KEY_00"
+          "current_key": "AIzaSyBW_5f-h1kMFEarSRmck5S9OVGyIrSn-0k"
         }
       ],
       "services": {
