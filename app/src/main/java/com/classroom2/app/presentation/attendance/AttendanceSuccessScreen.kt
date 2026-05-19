@@ -37,10 +37,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.classroom2.app.presentation.components.BadgePill
 import com.classroom2.app.presentation.components.PrimaryActionButton
 import com.classroom2.app.presentation.components.SuccessCheck
+import com.classroom2.app.ui.icons.ClassroomIcons
 import com.classroom2.app.ui.theme.ClassroomGradientEnd
 import com.classroom2.app.ui.theme.ClassroomGradientStart
 import com.classroom2.app.ui.theme.ClassroomShapes
 import com.classroom2.app.ui.theme.ClassroomSpacing
+import com.classroom2.app.util.TimeUtil
 
 @Composable
 fun AttendanceSuccessScreen(
@@ -88,13 +90,13 @@ fun AttendanceSuccessScreen(
                 verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)
             ) {
                 Text(
-                    "You're checked in!",
+                    "Attendance recorded",
                     style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
                 Text(
-                    "Attendance confirmed for Computer Science 101.",
+                    "Computer Science 101 · ${TimeUtil.formatShortTime(System.currentTimeMillis())}",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -138,13 +140,13 @@ fun AttendanceSuccessScreen(
                             Spacer(Modifier.size(4.dp))
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 BadgePill(
-                                    emoji = "💰",
+                                    icon = ClassroomIcons.points,
                                     label = "${o.totalPoints} pts total",
                                     accent = Color.White,
                                     softBackground = Color.White.copy(alpha = 0.18f)
                                 )
                                 BadgePill(
-                                    emoji = "🔥",
+                                    icon = ClassroomIcons.streak,
                                     label = "${o.streak} day streak",
                                     accent = Color.White,
                                     softBackground = Color.White.copy(alpha = 0.18f)

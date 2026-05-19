@@ -35,6 +35,7 @@ import com.classroom2.app.presentation.components.PrimaryActionButton
 import com.classroom2.app.presentation.components.SecondaryActionButton
 import com.classroom2.app.presentation.components.SectionHeader
 import com.classroom2.app.presentation.components.StatusChip
+import com.classroom2.app.ui.icons.ClassroomIcons
 import com.classroom2.app.ui.theme.ClassroomGreen
 import com.classroom2.app.ui.theme.ClassroomGreenSoft
 import com.classroom2.app.ui.theme.ClassroomOrange
@@ -63,8 +64,8 @@ fun QuizResultsScreen(
             if (quiz == null) {
                 EmptyStateCard(
                     title = "No quiz to summarize yet",
-                    message = "Start a quiz and live results will appear here.",
-                    emoji = "📊"
+                    message = "Start a quiz to see live results here.",
+                    icon = ClassroomIcons.barChart
                 )
                 return@Column
             }

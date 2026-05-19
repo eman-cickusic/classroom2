@@ -37,7 +37,7 @@ class InsightRepository {
         val confusingTopic = extractTopic(quiz.question)
 
         val recommendation = when {
-            total == 0 -> "Waiting for answers — share the quiz and results appear here live."
+            total == 0 -> "Waiting for answers. Share the quiz to see results here."
             correctPct >= 80 ->
                 "Most students understood this concept. Continue with a harder follow-up question."
             correctPct in 50..79 ->

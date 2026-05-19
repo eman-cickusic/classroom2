@@ -73,12 +73,12 @@ class LocalAttendanceRepository : AttendanceRepository {
         val session = InMemoryStore.activeSession.value
             ?: return AppResult.Error("This session is no longer active. Ask the professor to start a fresh one.")
         if (session.id != sessionId) return AppResult.Error("This session is no longer active. Ask the professor to start a fresh one.")
-        if (!session.active) return AppResult.Error("The professor ended this session — wait for the next one.")
+        if (!session.active) return AppResult.Error("The professor ended this session. Wait for the next one.")
         if (session.isExpired) return AppResult.Error("This QR code expired. Ask your professor to generate a fresh one.")
 
         val current = InMemoryStore.attendance.value[sessionId].orEmpty()
         if (current.any { it.studentId == student.id }) {
-            return AppResult.Error("You're already checked in — nice work!")
+            return AppResult.Error("You're already checked in for this session.")
         }
         val record = AttendanceRecord(
             id = student.id,
@@ -164,14 +164,14 @@ class FirestoreAttendanceRepository(
             val sessionRef = db.collection(FirestorePaths.SESSIONS).document(sessionId)
             val session = sessionRef.get().await().toObject(ClassSession::class.java)
                 ?: return AppResult.Error("This session is no longer active. Ask the professor to start a fresh one.")
-            if (!session.active) return AppResult.Error("The professor ended this session — wait for the next one.")
+            if (!session.active) return AppResult.Error("The professor ended this session. Wait for the next one.")
             if (session.isExpired) return AppResult.Error("This QR code expired. Ask your professor to generate a fresh one.")
 
             val attendanceRef = sessionRef
                 .collection(FirestorePaths.ATTENDANCE)
                 .document(student.id)
             if (attendanceRef.get().await().exists()) {
-                return AppResult.Error("You're already checked in — nice work!")
+                return AppResult.Error("You're already checked in for this session.")
             }
             val record = AttendanceRecord(
                 id = student.id,

@@ -15,11 +15,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.QrCode2
-import androidx.compose.material.icons.filled.QuestionAnswer
+import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.outlined.Backpack
+import androidx.compose.material.icons.outlined.EmojiEvents
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.QrCode2
+import androidx.compose.material.icons.outlined.QuestionAnswer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -85,9 +86,9 @@ fun ProfessorDashboardScreen(
                 verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.md)
             ) {
                 DashboardHeroCard(
-                    eyebrow = "Good morning",
+                    eyebrow = "Today",
                     title = professor.name,
-                    subtitle = "Ready to make today's class interactive?",
+                    subtitle = "Computer Science 101 · 32 students",
                     trailing = {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             DemoModeBanner()
@@ -126,23 +127,24 @@ fun ProfessorDashboardScreen(
                 ) {
                     if (activeSession != null) {
                         StatusChip(
-                            label = "Attendance live",
+                            label = "Attendance open",
                             accent = ClassroomGreen,
                             softBackground = ClassroomGreenSoft
                         )
                     }
                     if (activeQuiz != null) {
                         StatusChip(
-                            label = "Quiz live",
+                            label = "Quiz in progress",
                             accent = ClassroomOrange,
                             softBackground = ClassroomOrangeSoft
                         )
                     }
                     Spacer(Modifier.weight(1f))
                     SecondaryActionButton(
-                        text = "🎒 Student view",
+                        text = "Student view",
+                        icon = Icons.Outlined.Backpack,
                         onClick = onSwitchRole,
-                        modifier = Modifier.fillMaxWidth(0.42f)
+                        modifier = Modifier.fillMaxWidth(0.45f)
                     )
                 }
 
@@ -150,40 +152,40 @@ fun ProfessorDashboardScreen(
 
                 ActionCard(
                     title = "Start attendance",
-                    subtitle = if (activeSession != null) "Session live — tap to view QR"
-                               else "Generate a QR for students to scan",
-                    icon = Icons.Filled.QrCode2,
+                    subtitle = if (activeSession != null) "Session open. View QR."
+                               else "Generate a QR for students to scan.",
+                    icon = Icons.Outlined.QrCode2,
                     onClick = onStartAttendance
                 )
                 ActionCard(
                     title = "Start live quiz",
-                    subtitle = if (activeQuiz != null) "Quiz active — view answers"
-                               else "Ask one quick question, see live answers",
-                    icon = Icons.Filled.QuestionAnswer,
+                    subtitle = if (activeQuiz != null) "Quiz in progress. View answers."
+                               else "Ask one question. See live answers.",
+                    icon = Icons.Outlined.QuestionAnswer,
                     accent = ClassroomPurple,
                     accentContainer = ClassroomPurpleSoft,
                     onClick = onStartQuiz
                 )
                 ActionCard(
                     title = "Teaching insight",
-                    subtitle = "Class understanding + recommended next step",
-                    icon = Icons.Filled.AutoAwesome,
+                    subtitle = "Class understanding and recommended next step.",
+                    icon = Icons.Outlined.AutoAwesome,
                     accent = ClassroomGreen,
                     accentContainer = ClassroomGreenSoft,
                     onClick = onOpenInsights
                 )
                 ActionCard(
                     title = "Leaderboard",
-                    subtitle = "See who's leading the class",
-                    icon = Icons.Filled.EmojiEvents,
+                    subtitle = "Class ranking and badges.",
+                    icon = Icons.Outlined.EmojiEvents,
                     accent = ClassroomOrange,
                     accentContainer = ClassroomOrangeSoft,
                     onClick = onOpenLeaderboard
                 )
                 ActionCard(
                     title = "Attendance history",
-                    subtitle = "Review past sessions",
-                    icon = Icons.Filled.History,
+                    subtitle = "Past sessions.",
+                    icon = Icons.Outlined.History,
                     onClick = onOpenHistory
                 )
 
@@ -219,6 +221,7 @@ fun ProfessorDashboardScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+                Spacer(Modifier.size(ClassroomSpacing.sm))
             }
         }
     }

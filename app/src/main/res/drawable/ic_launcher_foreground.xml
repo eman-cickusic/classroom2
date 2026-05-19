@@ -4,12 +4,16 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- Three layered class-session cards centered in the safe zone (24-84) -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M54,30 L78,42 L78,66 L54,78 L30,66 L30,42 Z" />
+        android:fillAlpha="0.45"
+        android:pathData="M36,38 L72,38 A4,4 0 0 1 76,42 V48 A4,4 0 0 1 72,52 L36,52 A4,4 0 0 1 32,48 V42 A4,4 0 0 1 36,38 Z" />
     <path
-        android:fillColor="#FFE0E7FF"
-        android:pathData="M44,52 H64 M44,58 H64 M44,64 H58"
-        android:strokeColor="#FF4F46E5"
-        android:strokeWidth="2" />
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.75"
+        android:pathData="M32,54 L76,54 A4,4 0 0 1 80,58 V64 A4,4 0 0 1 76,68 L32,68 A4,4 0 0 1 28,64 V58 A4,4 0 0 1 32,54 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M28,70 L80,70 A4,4 0 0 1 84,74 V80 A4,4 0 0 1 80,84 L28,84 A4,4 0 0 1 24,80 V74 A4,4 0 0 1 28,70 Z" />
 </vector>

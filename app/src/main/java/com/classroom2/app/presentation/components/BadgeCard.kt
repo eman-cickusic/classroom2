@@ -1,10 +1,15 @@
 package com.classroom2.app.presentation.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -16,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.classroom2.app.domain.model.Badge
+import com.classroom2.app.ui.icons.ClassroomIcons
 
 @Composable
 fun BadgeCard(
@@ -23,20 +29,38 @@ fun BadgeCard(
     earned: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val container = if (earned)
+        MaterialTheme.colorScheme.tertiaryContainer
+    else MaterialTheme.colorScheme.surfaceVariant
+    val accent = if (earned)
+        MaterialTheme.colorScheme.tertiary
+    else MaterialTheme.colorScheme.onSurfaceVariant
+
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .alpha(if (earned) 1f else 0.45f),
+            .alpha(if (earned) 1f else 0.55f),
         shape = RoundedCornerShape(16.dp),
-        color = if (earned) MaterialTheme.colorScheme.tertiaryContainer
-        else MaterialTheme.colorScheme.surfaceVariant
+        color = container
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(badge.emoji, style = MaterialTheme.typography.displaySmall)
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(MaterialTheme.colorScheme.surface, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = ClassroomIcons.badge(badge),
+                    contentDescription = null,
+                    tint = accent,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
             Text(
                 badge.title,
                 style = MaterialTheme.typography.labelLarge,

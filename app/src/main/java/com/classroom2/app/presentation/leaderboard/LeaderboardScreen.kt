@@ -85,7 +85,7 @@ fun LeaderboardScreen(onBack: () -> Unit) {
                 )
                 MetricCard(
                     label = "Streak",
-                    value = "🔥 ${student.streak}",
+                    value = "${student.streak} days",
                     modifier = Modifier.weight(1f),
                     accent = ClassroomOrange,
                     softBackground = ClassroomOrangeSoft

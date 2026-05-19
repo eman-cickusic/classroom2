@@ -28,7 +28,7 @@ object AIExplainer {
                 "• It works by applying the same rule across many cases.\n" +
                 "• Remembering one clear example makes $c easy to apply later."
             ExplanationMode.MINI_QUIZ ->
-                "Quick check:\nQuestion: What is the core idea of $c?\n" +
+                "Check your understanding:\nQuestion: What is the core idea of $c?\n" +
                 "A. Memorizing the definition only\n" +
                 "B. Understanding how the rule applies in different cases\n" +
                 "C. Avoiding examples entirely\n" +
@@ -51,7 +51,7 @@ object AIExplainer {
             "• The same method name can do different things for different objects.\n" +
             "• Achieved through inheritance or interfaces in object-oriented languages."
         ExplanationMode.MINI_QUIZ ->
-            "Quick check:\nQuestion: What does polymorphism mean in programming?\n" +
+            "Check your understanding:\nQuestion: What does polymorphism mean in programming?\n" +
             "A. A variable changing value\n" +
             "B. One interface having many forms\n" +
             "C. A loop inside another loop\n" +
@@ -59,6 +59,6 @@ object AIExplainer {
     }
 
     private fun emptyResponse(): String =
-        "Type a concept above and pick a mode — then tap Explain. " +
-        "Try \"polymorphism\" for a demo-ready answer."
+        "Type a concept above, pick a mode, then tap Explain. " +
+        "Try \"polymorphism\" for a structured example."
 }

@@ -36,6 +36,7 @@ import com.classroom2.app.presentation.components.OptionCard
 import com.classroom2.app.presentation.components.PrimaryActionButton
 import com.classroom2.app.presentation.components.StatusChip
 import com.classroom2.app.presentation.components.SuccessCheck
+import com.classroom2.app.ui.icons.ClassroomIcons
 import com.classroom2.app.ui.theme.ClassroomGreen
 import com.classroom2.app.ui.theme.ClassroomGreenSoft
 import com.classroom2.app.ui.theme.ClassroomOrange
@@ -66,8 +67,8 @@ fun StudentQuizScreen(
             when {
                 q == null -> EmptyStateCard(
                     title = "No live quiz",
-                    message = "Hang tight — your professor will start one any moment.",
-                    emoji = "⏳"
+                    message = "Waiting for the next live quiz.",
+                    icon = ClassroomIcons.queryStats
                 )
 
                 submission?.isSuccess == true ->
@@ -78,7 +79,7 @@ fun StudentQuizScreen(
 
                 else -> {
                     StatusChip(
-                        label = "Live · one answer only",
+                        label = "Live, one answer only",
                         accent = ClassroomOrange,
                         softBackground = ClassroomOrangeSoft
                     )
@@ -143,24 +144,19 @@ private fun AnswerConfirmation(correct: Boolean, totalPoints: Int) {
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    if (correct) "Correct! 🎯" else "Answer submitted",
+                    if (correct) "Correct" else "Answer submitted",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    if (correct) "Great answer!" else "Thanks for participating.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     BadgePill(
-                        emoji = "💰",
+                        icon = ClassroomIcons.points,
                         label = if (correct) "+20 pts" else "+5 pts",
                         accent = ClassroomGreen,
                         softBackground = ClassroomGreenSoft
                     )
                     BadgePill(
-                        emoji = "🏆",
+                        icon = ClassroomIcons.trophy,
                         label = "$totalPoints total"
                     )
                 }

@@ -47,6 +47,7 @@ import com.classroom2.app.presentation.components.EmptyStateCard
 import com.classroom2.app.presentation.components.SectionHeader
 import com.classroom2.app.presentation.components.StatusChip
 import com.classroom2.app.presentation.quiz.QuizViewModel
+import com.classroom2.app.ui.icons.ClassroomIcons
 import com.classroom2.app.ui.theme.ClassroomGradientEnd
 import com.classroom2.app.ui.theme.ClassroomGradientStart
 import com.classroom2.app.ui.theme.ClassroomGreen
@@ -83,15 +84,15 @@ fun InsightDashboardScreen(
             if (insight == null || state.quiz == null) {
                 EmptyStateCard(
                     title = "No quiz to analyze",
-                    message = "Run a live quiz and the teaching insight will appear here.",
-                    emoji = "📈"
+                    message = "Run a live quiz to see the teaching insight here.",
+                    icon = ClassroomIcons.insight
                 )
                 return@Column
             }
 
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 StatusChip(
-                    label = "Teaching insight ready",
+                    label = "Teaching insight",
                     accent = ClassroomPurple,
                     softBackground = ClassroomPurpleSoft
                 )
@@ -156,7 +157,12 @@ fun InsightDashboardScreen(
                 color = ClassroomGreenSoft
             ) {
                 Row(modifier = Modifier.padding(ClassroomSpacing.md), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)) {
-                    Text("🧪", style = MaterialTheme.typography.titleLarge)
+                    Icon(
+                        imageVector = ClassroomIcons.lightbulb,
+                        contentDescription = null,
+                        tint = ClassroomGreen,
+                        modifier = Modifier.size(22.dp)
+                    )
                     Text(insight.suggestedFollowUp, style = MaterialTheme.typography.bodyLarge)
                 }
             }

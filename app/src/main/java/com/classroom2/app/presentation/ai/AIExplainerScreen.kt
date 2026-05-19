@@ -20,7 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -48,6 +48,7 @@ import com.classroom2.app.presentation.components.LoadingCard
 import com.classroom2.app.presentation.components.PrimaryActionButton
 import com.classroom2.app.presentation.components.SectionHeader
 import com.classroom2.app.presentation.components.StatusChip
+import com.classroom2.app.ui.icons.ClassroomIcons
 import com.classroom2.app.ui.theme.ClassroomPurple
 import com.classroom2.app.ui.theme.ClassroomPurpleSoft
 import com.classroom2.app.ui.theme.ClassroomShapes
@@ -92,12 +93,12 @@ fun AIExplainerScreen(onBack: () -> Unit) {
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        "Ask Classroom AI",
+                        "Classroom AI",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        "Clear, classroom-friendly explanations of any concept.",
+                        "Generate a structured explanation of any concept.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -146,9 +147,9 @@ fun AIExplainerScreen(onBack: () -> Unit) {
             when {
                 loading -> LoadingCard(label = "Generating explanation…")
                 result == null -> EmptyStateCard(
-                    title = "Pick a concept and a style",
-                    message = "Type any term above, choose a mode, then tap Explain to see a friendly walkthrough.",
-                    emoji = "💡"
+                    title = "Choose a concept and style",
+                    message = "Type a concept, pick a mode, then generate.",
+                    icon = ClassroomIcons.lightbulb
                 )
                 else -> {
                     AnimatedVisibility(
@@ -192,7 +193,7 @@ fun AIExplainerScreen(onBack: () -> Unit) {
                                         }
                                     }) {
                                         Icon(
-                                            Icons.Filled.ContentCopy,
+                                            Icons.Outlined.ContentCopy,
                                             contentDescription = "Copy",
                                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                                         )

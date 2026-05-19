@@ -4,6 +4,11 @@ import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.QrCodeScanner
+import com.classroom2.app.ui.icons.ClassroomIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -135,7 +140,12 @@ fun StudentScannerScreen(
                                 .background(Color.White.copy(alpha = 0.12f), CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("📷", style = MaterialTheme.typography.displayMedium)
+                            Icon(
+                                imageVector = Icons.Outlined.CameraAlt,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(36.dp)
+                            )
                         }
                         Text(
                             "Camera off",
@@ -144,7 +154,7 @@ fun StudentScannerScreen(
                             fontWeight = FontWeight.SemiBold
                         )
                         Text(
-                            "Use Demo Scan below — same flow, no camera required.",
+                            "Use Demo scan below. Same flow, no camera required.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.White.copy(alpha = 0.8f)
                         )
@@ -154,7 +164,8 @@ fun StudentScannerScreen(
             }
 
             PrimaryActionButton(
-                text = "🎯 Demo scan (works without camera)",
+                text = "Demo scan (works without camera)",
+                icon = Icons.Outlined.QrCodeScanner,
                 onClick = { vm.demoScan() }
             )
 

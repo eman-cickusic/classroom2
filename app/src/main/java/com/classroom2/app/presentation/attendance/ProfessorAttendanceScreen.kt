@@ -22,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.Lock
+import com.classroom2.app.ui.icons.ClassroomIcons
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -117,7 +118,7 @@ fun ProfessorAttendanceScreen(
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                "Tap any student's phone to check in",
+                                "Students scan to check in.",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -262,8 +263,8 @@ fun ProfessorAttendanceScreen(
             if (state.records.isEmpty()) {
                 EmptyStateCard(
                     title = "No students yet",
-                    message = "Keep the QR visible and check-ins will appear live.",
-                    emoji = "📭"
+                    message = "Keep the QR visible. Check-ins appear here as they arrive.",
+                    icon = ClassroomIcons.emptyAttendance
                 )
             } else {
                 Column(verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)) {

@@ -64,7 +64,7 @@ class LocalQuizRepository : QuizRepository {
         if (selectedIndex !in quiz.options.indices) return AppResult.Error("Pick one of the four options to submit.")
         val current = InMemoryStore.quizAnswers.value[quiz.id].orEmpty()
         if (current.any { it.studentId == student.id }) {
-            return AppResult.Error("You already answered — wait for the next question.")
+            return AppResult.Error("You already answered. Wait for the next question.")
         }
         val answer = QuizAnswer(
             id = student.id,
@@ -142,7 +142,7 @@ class FirestoreQuizRepository(
                 .collection(FirestorePaths.ANSWERS)
                 .document(student.id)
             if (answerRef.get().await().exists()) {
-                return AppResult.Error("You already answered — wait for the next question.")
+                return AppResult.Error("You already answered. Wait for the next question.")
             }
             val answer = QuizAnswer(
                 id = student.id,

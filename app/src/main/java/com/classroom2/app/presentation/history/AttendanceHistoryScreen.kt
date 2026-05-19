@@ -29,6 +29,7 @@ import com.classroom2.app.presentation.components.ClassroomTopBar
 import com.classroom2.app.presentation.components.EmptyStateCard
 import com.classroom2.app.presentation.components.SectionHeader
 import com.classroom2.app.presentation.components.StatusChip
+import com.classroom2.app.ui.icons.ClassroomIcons
 import com.classroom2.app.ui.theme.ClassroomGreen
 import com.classroom2.app.ui.theme.ClassroomGreenSoft
 import com.classroom2.app.ui.theme.ClassroomShapes
@@ -52,8 +53,8 @@ fun AttendanceHistoryScreen(onBack: () -> Unit) {
             if (history.isEmpty()) {
                 EmptyStateCard(
                     title = "No saved sessions yet",
-                    message = "Your completed attendance sessions will appear here.",
-                    emoji = "🗂️"
+                    message = "Completed attendance sessions appear here.",
+                    icon = ClassroomIcons.folder
                 )
                 return@Column
             }

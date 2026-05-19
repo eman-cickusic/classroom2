@@ -87,7 +87,7 @@ class AttendanceViewModel : ViewModel() {
         val payload = AttendanceQrPayload.fromJson(raw)
         if (payload == null) {
             InMemoryStore.lastScanOutcome.value = ScanOutcomeState(
-                error = "That QR code isn't a Classroom 2.0 session — point at the professor's QR."
+                error = "That QR code isn't a Classroom 2.0 session. Point at the professor's QR."
             )
             return
         }

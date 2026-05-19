@@ -27,6 +27,7 @@ import com.classroom2.app.presentation.components.PrimaryActionButton
 import com.classroom2.app.presentation.components.SecondaryActionButton
 import com.classroom2.app.presentation.components.SectionHeader
 import com.classroom2.app.presentation.components.StatusChip
+import com.classroom2.app.ui.icons.ClassroomIcons
 import com.classroom2.app.ui.theme.ClassroomOrange
 import com.classroom2.app.ui.theme.ClassroomOrangeSoft
 import com.classroom2.app.ui.theme.ClassroomShapes
@@ -59,7 +60,7 @@ fun CreateQuizScreen(
                     Column(modifier = Modifier.padding(ClassroomSpacing.md), verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)) {
                         Row {
                             StatusChip(
-                                label = "Quiz live",
+                                label = "Quiz in progress",
                                 accent = ClassroomOrange,
                                 softBackground = ClassroomOrangeSoft
                             )
@@ -127,7 +128,8 @@ fun CreateQuizScreen(
             }
 
             SecondaryActionButton(
-                text = "✨ Use demo question",
+                text = "Use demo question",
+                icon = ClassroomIcons.sparkle,
                 onClick = vm::useDemoQuestion
             )
             PrimaryActionButton(

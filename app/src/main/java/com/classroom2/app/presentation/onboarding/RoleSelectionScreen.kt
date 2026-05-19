@@ -22,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,12 +36,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.classroom2.app.R
 import com.classroom2.app.domain.model.UserRole
 import com.classroom2.app.presentation.components.DemoModeBannerOnGradient
 import com.classroom2.app.presentation.components.PrimaryActionButton
 import com.classroom2.app.presentation.components.StatusChip
+import com.classroom2.app.ui.icons.ClassroomIcons
 import com.classroom2.app.ui.theme.ClassroomGradientEnd
 import com.classroom2.app.ui.theme.ClassroomGradientEndDark
 import com.classroom2.app.ui.theme.ClassroomGradientStart
@@ -89,14 +94,19 @@ fun RoleSelectionScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                             Box(
                                 modifier = Modifier
-                                    .size(48.dp)
-                                    .background(Color.White.copy(alpha = 0.22f), CircleShape),
+                                    .size(44.dp)
+                                    .background(Color.White.copy(alpha = 0.18f), RoundedCornerShape(12.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("🎓", style = MaterialTheme.typography.headlineSmall)
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_classroom_logo),
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(22.dp)
+                                )
                             }
                             Text(
                                 "Classroom 2.0",
@@ -122,11 +132,10 @@ fun RoleSelectionScreen(
 
                     Spacer(Modifier.height(ClassroomSpacing.sm))
 
-                    // Floating mini-metric cards
                     Row(horizontalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)) {
-                        FloatingMini("92%", "attendance captured", Modifier.weight(1f))
-                        FloatingMini("Live", "quiz active", Modifier.weight(1f))
-                        FloatingMini("AI", "insight ready", Modifier.weight(1f))
+                        FloatingMini(headline = "92%", label = "attendance captured", icon = ClassroomIcons.attendance, modifier = Modifier.weight(1f))
+                        FloatingMini(headline = "Live", label = "quiz active", icon = ClassroomIcons.barChart, modifier = Modifier.weight(1f))
+                        FloatingMini(headline = "AI", label = "insight ready", icon = ClassroomIcons.sparkle, modifier = Modifier.weight(1f))
                     }
                 }
             }
@@ -147,23 +156,23 @@ fun RoleSelectionScreen(
                 )
 
                 RoleOption(
-                    emoji = "👩‍🏫",
+                    icon = ClassroomIcons.role(UserRole.PROFESSOR),
                     title = "Professor",
-                    description = "Start attendance, run live quizzes, see real-time insights",
+                    description = "Start attendance, run live quizzes, see real-time insights.",
                     selected = selected == UserRole.PROFESSOR,
                     onClick = { selected = UserRole.PROFESSOR }
                 )
 
                 RoleOption(
-                    emoji = "🎒",
+                    icon = ClassroomIcons.role(UserRole.STUDENT),
                     title = "Student",
-                    description = "Scan QR, join quizzes, ask AI, earn points",
+                    description = "Scan QR, join quizzes, ask AI, earn points.",
                     selected = selected == UserRole.STUDENT,
                     onClick = { selected = UserRole.STUDENT }
                 )
 
                 Text(
-                    "Choose a role to explore the live classroom flow.",
+                    "Select a role to continue.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -183,7 +192,12 @@ fun RoleSelectionScreen(
 }
 
 @Composable
-private fun FloatingMini(headline: String, label: String, modifier: Modifier = Modifier) {
+private fun FloatingMini(
+    headline: String,
+    label: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier
+) {
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(18.dp),
@@ -191,8 +205,14 @@ private fun FloatingMini(headline: String, label: String, modifier: Modifier = M
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(16.dp)
+            )
             Text(headline, color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
             Text(label, color = Color.White.copy(alpha = 0.85f), style = MaterialTheme.typography.labelSmall)
         }
@@ -201,7 +221,7 @@ private fun FloatingMini(headline: String, label: String, modifier: Modifier = M
 
 @Composable
 private fun RoleOption(
-    emoji: String,
+    icon: ImageVector,
     title: String,
     description: String,
     selected: Boolean,
@@ -223,10 +243,19 @@ private fun RoleOption(
             Box(
                 modifier = Modifier
                     .size(56.dp)
-                    .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
+                    .background(
+                        color = if (selected) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.primaryContainer,
+                        shape = CircleShape
+                    ),
                 contentAlignment = Alignment.Center
             ) {
-                Text(emoji, style = MaterialTheme.typography.headlineSmall)
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = if (selected) Color.White else MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp)
+                )
             }
             Spacer(Modifier.size(ClassroomSpacing.md))
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {

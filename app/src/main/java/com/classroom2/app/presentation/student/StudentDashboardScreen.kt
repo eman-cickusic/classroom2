@@ -14,14 +14,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.QrCodeScanner
-import androidx.compose.material.icons.filled.QuestionAnswer
+import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.outlined.EmojiEvents
+import androidx.compose.material.icons.outlined.QrCodeScanner
+import androidx.compose.material.icons.outlined.QuestionAnswer
+import androidx.compose.material.icons.outlined.School
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +48,7 @@ import com.classroom2.app.presentation.components.DemoModeBanner
 import com.classroom2.app.presentation.components.SecondaryActionButton
 import com.classroom2.app.presentation.components.SectionHeader
 import com.classroom2.app.presentation.components.StatusChip
+import com.classroom2.app.ui.icons.ClassroomIcons
 import com.classroom2.app.ui.theme.ClassroomGreen
 import com.classroom2.app.ui.theme.ClassroomGreenSoft
 import com.classroom2.app.ui.theme.ClassroomOrange
@@ -68,7 +72,6 @@ fun StudentDashboardScreen(
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
 
-    // Progress to next "milestone": every 50 pts unlocks a badge tier.
     val nextMilestone = ((student.points / 50) + 1) * 50
     val progress = (student.points % 50) / 50f
     val pointsToNext = nextMilestone - student.points
@@ -85,9 +88,9 @@ fun StudentDashboardScreen(
                 verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.md)
             ) {
                 DashboardHeroCard(
-                    eyebrow = "Hi there 👋",
+                    eyebrow = "Welcome",
                     title = student.name,
-                    subtitle = "You're on a ${student.streak}-class learning streak.",
+                    subtitle = "Current streak: ${student.streak} classes.",
                     trailing = { DemoModeBanner() },
                     metrics = {
                         Column(modifier = Modifier.padding(4.dp), verticalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)) {
@@ -110,12 +113,23 @@ fun StudentDashboardScreen(
                                     )
                                 }
                                 Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                    StatusChip(
-                                        label = "🔥 ${student.streak} days",
-                                        accent = Color.White,
-                                        softBackground = Color.White.copy(alpha = 0.2f),
-                                        showDot = false
-                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = ClassroomIcons.streak,
+                                            contentDescription = null,
+                                            tint = Color.White,
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                        StatusChip(
+                                            label = "${student.streak} days",
+                                            accent = Color.White,
+                                            softBackground = Color.White.copy(alpha = 0.2f),
+                                            showDot = false
+                                        )
+                                    }
                                     if (student.badges.isNotEmpty()) {
                                         Text(
                                             "Latest: ${student.badges.last()}",
@@ -167,13 +181,14 @@ fun StudentDashboardScreen(
                         StatusChip(label = "Scan now", accent = ClassroomGreen, softBackground = ClassroomGreenSoft)
                     }
                     if (activeQuiz != null) {
-                        StatusChip(label = "Quiz live", accent = ClassroomOrange, softBackground = ClassroomOrangeSoft)
+                        StatusChip(label = "Quiz in progress", accent = ClassroomOrange, softBackground = ClassroomOrangeSoft)
                     }
                     Spacer(Modifier.weight(1f))
                     SecondaryActionButton(
-                        text = "👩‍🏫 Pro view",
+                        text = "Professor view",
+                        icon = Icons.Outlined.School,
                         onClick = onSwitchRole,
-                        modifier = Modifier.fillMaxWidth(0.42f)
+                        modifier = Modifier.fillMaxWidth(0.5f)
                     )
                 }
 
@@ -181,32 +196,32 @@ fun StudentDashboardScreen(
 
                 ActionCard(
                     title = "Scan attendance QR",
-                    subtitle = if (activeSession != null) "Session live — tap to check in"
-                               else "Open scanner when professor starts attendance",
-                    icon = Icons.Filled.QrCodeScanner,
+                    subtitle = if (activeSession != null) "Session open. Tap to check in."
+                               else "Open scanner when the professor starts attendance.",
+                    icon = Icons.Outlined.QrCodeScanner,
                     onClick = onScan
                 )
                 ActionCard(
                     title = "Join live quiz",
-                    subtitle = if (activeQuiz != null) "Quiz is open right now"
-                               else "Wait for professor to start a quiz",
-                    icon = Icons.Filled.QuestionAnswer,
+                    subtitle = if (activeQuiz != null) "Quiz is open."
+                               else "Waiting for the next live quiz.",
+                    icon = Icons.Outlined.QuestionAnswer,
                     accent = ClassroomPurple,
                     accentContainer = ClassroomPurpleSoft,
                     onClick = onJoinQuiz
                 )
                 ActionCard(
-                    title = "Ask AI explainer",
-                    subtitle = "Get a clearer explanation of any concept",
-                    icon = Icons.Filled.AutoAwesome,
+                    title = "AI explainer",
+                    subtitle = "Get a structured explanation of any concept.",
+                    icon = Icons.Outlined.AutoAwesome,
                     accent = ClassroomGreen,
                     accentContainer = ClassroomGreenSoft,
                     onClick = onAIExplainer
                 )
                 ActionCard(
                     title = "Leaderboard",
-                    subtitle = "See how you rank in the class",
-                    icon = Icons.Filled.EmojiEvents,
+                    subtitle = "Class ranking and badges.",
+                    icon = Icons.Outlined.EmojiEvents,
                     accent = ClassroomOrange,
                     accentContainer = ClassroomOrangeSoft,
                     onClick = onLeaderboard
@@ -216,7 +231,10 @@ fun StudentDashboardScreen(
                     SectionHeader(title = "Badges earned")
                     Row(horizontalArrangement = Arrangement.spacedBy(ClassroomSpacing.sm)) {
                         student.badges.takeLast(3).forEach { name ->
-                            BadgePill(emoji = badgeEmoji(name), label = name)
+                            BadgePill(
+                                icon = ClassroomIcons.badgeByTitle(name),
+                                label = name
+                            )
                         }
                     }
                 }
@@ -224,6 +242,3 @@ fun StudentDashboardScreen(
         }
     }
 }
-
-private fun badgeEmoji(name: String): String =
-    com.classroom2.app.domain.model.Badge.emojiFor(name)

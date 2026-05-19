@@ -54,6 +54,7 @@ fun SecondaryActionButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
     enabled: Boolean = true
 ) {
     OutlinedButton(
@@ -64,6 +65,12 @@ fun SecondaryActionButton(
         shape = RoundedCornerShape(18.dp),
         enabled = enabled
     ) {
-        Text(text, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if (icon != null) Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
+            Text(text, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+        }
     }
 }
