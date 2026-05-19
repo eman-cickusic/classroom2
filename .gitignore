@@ -7,6 +7,10 @@
 # CI artifacts downloaded locally
 ci-apk/
 
+# Stray drop-zone files at repo root — keep google-services.json only under app/
+/google-services.json
+/Screenshot*.png
+
 # Files for the ART/Dalvik VM
 *.dex
 
