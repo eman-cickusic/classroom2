@@ -4,6 +4,9 @@
 *.ap_
 *.aab
 
+# CI artifacts downloaded locally
+ci-apk/
+
 # Files for the ART/Dalvik VM
 *.dex
 
