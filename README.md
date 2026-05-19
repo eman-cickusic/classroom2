@@ -81,17 +81,23 @@ The full classroom loop on a single Android device:
 
 ## Screenshots
 
-| Professor Dashboard | QR Attendance | Student Success |
-|---|---|---|
-| ![](screenshots/professor_dashboard.png) | ![](screenshots/qr_attendance.png) | ![](screenshots/student_success.png) |
+![Onboarding](screenshots/onboarding.png)
 
-| Live Quiz | Insight Dashboard | AI Explainer |
+| Professor Dashboard | Student Dashboard | QR Attendance |
 |---|---|---|
-| ![](screenshots/live_quiz.png) | ![](screenshots/insight_dashboard.png) | ![](screenshots/ai_explainer.png) |
+| ![](screenshots/professor_dashboard.png) | ![](screenshots/student_dashboard.png) | ![](screenshots/qr_attendance.png) |
 
-| Leaderboard | Quiz Results | Student Dashboard |
+| Student Scanner | Live Quiz | Quiz Submitted |
 |---|---|---|
-| ![](screenshots/leaderboard.png) | ![](screenshots/quiz_results.png) | ![](screenshots/student_dashboard.png) |
+| ![](screenshots/student_scanner.png) | ![](screenshots/live_quiz.png) | ![](screenshots/quiz_success.png) |
+
+| Quiz Results | Insight Dashboard | AI Explainer |
+|---|---|---|
+| ![](screenshots/quiz_results.png) | ![](screenshots/insight_dashboard.png) | ![](screenshots/ai_explainer.png) |
+
+| Leaderboard | Badges | Attendance History |
+|---|---|---|
+| ![](screenshots/leaderboard.png) | ![](screenshots/badges.png) | ![](screenshots/attendance_history.png) |
 
 ---
 
