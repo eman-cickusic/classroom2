@@ -8,7 +8,6 @@ import com.classroom2.app.domain.model.User
 import com.classroom2.app.util.AppResult
 import com.classroom2.app.util.DemoData
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -100,13 +99,15 @@ class FirestoreQuizRepository(
     }
 
     override fun observeActiveQuiz(classId: String): Flow<Quiz?> = callbackFlow {
+        // Sort client-side to avoid a composite index requirement.
         val reg = db.collection(FirestorePaths.QUIZZES)
             .whereEqualTo("classId", classId)
             .whereEqualTo("active", true)
-            .orderBy("createdAt", Query.Direction.DESCENDING)
-            .limit(1)
             .addSnapshotListener { snap, _ ->
-                trySend(snap?.documents?.firstOrNull()?.toObject(Quiz::class.java))
+                val newest = snap?.documents
+                    ?.mapNotNull { it.toObject(Quiz::class.java) }
+                    ?.maxByOrNull { it.createdAt }
+                trySend(newest)
             }
         awaitClose { reg.remove() }
     }
@@ -115,9 +116,12 @@ class FirestoreQuizRepository(
         val reg = db.collection(FirestorePaths.QUIZZES)
             .document(quizId)
             .collection(FirestorePaths.ANSWERS)
-            .orderBy("submittedAt", Query.Direction.ASCENDING)
             .addSnapshotListener { snap, _ ->
-                trySend(snap?.documents?.mapNotNull { it.toObject(QuizAnswer::class.java) }.orEmpty())
+                val sorted = snap?.documents
+                    ?.mapNotNull { it.toObject(QuizAnswer::class.java) }
+                    ?.sortedBy { it.submittedAt }
+                    .orEmpty()
+                trySend(sorted)
             }
         awaitClose { reg.remove() }
     }

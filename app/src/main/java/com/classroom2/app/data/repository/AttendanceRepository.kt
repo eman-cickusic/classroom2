@@ -8,7 +8,6 @@ import com.classroom2.app.domain.model.User
 import com.classroom2.app.util.AppResult
 import com.classroom2.app.util.DemoData
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -116,24 +115,31 @@ class FirestoreAttendanceRepository(
     }
 
     override fun observeActiveSession(classId: String): Flow<ClassSession?> = callbackFlow {
+        // Two whereEqualTo filters use single-field indexes (auto-created).
+        // We sort client-side to avoid the composite index a server-side orderBy would require.
         val reg = db.collection(FirestorePaths.SESSIONS)
             .whereEqualTo("classId", classId)
             .whereEqualTo("active", true)
-            .orderBy("createdAt", Query.Direction.DESCENDING)
-            .limit(1)
             .addSnapshotListener { snap, _ ->
-                trySend(snap?.documents?.firstOrNull()?.toObject(ClassSession::class.java))
+                val newest = snap?.documents
+                    ?.mapNotNull { it.toObject(ClassSession::class.java) }
+                    ?.maxByOrNull { it.createdAt }
+                trySend(newest)
             }
         awaitClose { reg.remove() }
     }
 
     override fun observeAttendance(sessionId: String): Flow<List<AttendanceRecord>> = callbackFlow {
+        // No orderBy on the server; sort client-side.
         val reg = db.collection(FirestorePaths.SESSIONS)
             .document(sessionId)
             .collection(FirestorePaths.ATTENDANCE)
-            .orderBy("timestamp", Query.Direction.ASCENDING)
             .addSnapshotListener { snap, _ ->
-                trySend(snap?.documents?.mapNotNull { it.toObject(AttendanceRecord::class.java) }.orEmpty())
+                val sorted = snap?.documents
+                    ?.mapNotNull { it.toObject(AttendanceRecord::class.java) }
+                    ?.sortedBy { it.timestamp }
+                    .orEmpty()
+                trySend(sorted)
             }
         awaitClose { reg.remove() }
     }
@@ -142,9 +148,12 @@ class FirestoreAttendanceRepository(
         val reg = db.collection(FirestorePaths.SESSIONS)
             .whereEqualTo("classId", classId)
             .whereEqualTo("active", false)
-            .orderBy("createdAt", Query.Direction.DESCENDING)
             .addSnapshotListener { snap, _ ->
-                trySend(snap?.documents?.mapNotNull { it.toObject(ClassSession::class.java) }.orEmpty())
+                val sorted = snap?.documents
+                    ?.mapNotNull { it.toObject(ClassSession::class.java) }
+                    ?.sortedByDescending { it.createdAt }
+                    .orEmpty()
+                trySend(sorted)
             }
         awaitClose { reg.remove() }
     }
